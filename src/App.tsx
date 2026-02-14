@@ -3,7 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import Index from "./pages/Index";
+import OnboardingRole from "./pages/OnboardingRole";
+import OnboardingResume from "./pages/OnboardingResume";
+import OnboardingSkills from "./pages/OnboardingSkills";
+import OnboardingPaths from "./pages/OnboardingPaths";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -13,13 +19,19 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <OnboardingProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/onboarding/role" element={<OnboardingRole />} />
+            <Route path="/onboarding/resume" element={<OnboardingResume />} />
+            <Route path="/onboarding/skills" element={<OnboardingSkills />} />
+            <Route path="/onboarding/paths" element={<OnboardingPaths />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </OnboardingProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
