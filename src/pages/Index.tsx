@@ -1,12 +1,24 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Briefcase, Sparkles, Bell, ArrowRight } from "lucide-react";
+import { Sparkles, Compass, Zap, ChevronDown } from "lucide-react";
 
-const features = [
-  { icon: Sparkles, title: "AI Career Matching", desc: "Upload your resume and discover perfect-fit roles" },
-  { icon: Briefcase, title: "Fresh Jobs Daily", desc: "Scraped from top platforms, matched to your skills" },
-  { icon: Bell, title: "Smart Notifications", desc: "Get alerted when high-match jobs appear" },
+const steps = [
+  {
+    num: 1,
+    title: "Shape your professional story",
+    desc: "Draft a Career Identity Statement that showcases the unique skills and experiences you bring to the workforce.",
+  },
+  {
+    num: 2,
+    title: "Explore career possibilities",
+    desc: "Discover careers that might align with your background and delve deeper into those that interest you.",
+  },
+  {
+    num: 3,
+    title: "Take the next step",
+    desc: "Get matched with jobs and take the first steps toward your career goals.",
+  },
 ];
 
 const Index = () => {
@@ -14,68 +26,96 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Nav */}
-      <header className="w-full flex items-center justify-between px-6 py-4 max-w-5xl mx-auto">
-        <span className="text-xl font-bold text-foreground tracking-tight">
-          JOBITTER
-        </span>
-        <Button variant="ghost" size="sm" onClick={() => navigate("/onboarding/role")}>
-          Sign in
-        </Button>
+      {/* Top Nav */}
+      <header className="w-full flex items-center justify-center py-4 border-b border-border bg-card/60 backdrop-blur-sm">
+        <div className="flex items-center gap-1">
+          <span className="text-lg font-normal text-foreground tracking-tight">career</span>
+          <span className="text-lg font-medium bg-gradient-to-r from-[hsl(199,89%,48%)] via-[hsl(168,76%,47%)] to-[hsl(85,72%,50%)] bg-clip-text text-transparent tracking-tight">
+            dreamer
+          </span>
+        </div>
       </header>
 
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pb-24">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-xl"
-        >
-          <div className="inline-flex items-center gap-2 bg-accent text-accent-foreground rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+      {/* Nav Pills */}
+      <div className="w-full px-4 py-3 flex justify-center">
+        <div className="flex gap-3 max-w-3xl w-full">
+          <button className="nav-pill flex-1 justify-center">
             <Sparkles className="w-4 h-4" />
-            AI-powered career discovery
-          </div>
+            Career Identity
+          </button>
+          <button className="nav-pill flex-1 justify-center">
+            <Compass className="w-4 h-4" />
+            Explore Paths
+          </button>
+          <button className="nav-pill flex-1 justify-center">
+            <Zap className="w-4 h-4" />
+            Get Matched
+          </button>
+        </div>
+      </div>
 
-          <h1 className="text-heading text-5xl md:text-6xl leading-tight mb-6">
-            Find your next
-            <br />
-            <span className="text-primary">dream role</span>
+      {/* Hero */}
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl"
+        >
+          <h1 className="mb-5">
+            <span className="text-6xl md:text-7xl font-light text-foreground tracking-tight">career </span>
+            <span className="text-6xl md:text-7xl font-medium bg-gradient-to-r from-[hsl(199,89%,48%)] via-[hsl(168,76%,47%)] to-[hsl(85,72%,50%)] bg-clip-text text-transparent tracking-tight">
+              dreamer
+            </span>
           </h1>
 
-          <p className="text-muted-foreground text-lg mb-10 max-w-md mx-auto">
-            Upload your resume, explore career paths, and get matched with jobs that fit — automatically.
+          <p className="text-muted-foreground text-lg mb-10">
+            A playful way to explore career possibilities with AI
           </p>
 
           <Button
-            variant="hero"
-            size="xl"
             onClick={() => navigate("/onboarding/role")}
-            className="group"
+            className="h-14 px-16 rounded-xl text-base font-medium shadow-md hover:shadow-lg transition-all"
           >
-            Get Started
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Start
           </Button>
         </motion.div>
 
-        {/* Features */}
+        {/* Scroll indicator */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 max-w-3xl w-full"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-24"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ delay: 1 }}
         >
-          {features.map((f) => (
-            <div key={f.title} className="card-dreamer text-center p-6">
-              <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
-                <f.icon className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-heading text-base mb-2">{f.title}</h3>
-              <p className="text-muted-foreground text-sm">{f.desc}</p>
-            </div>
-          ))}
+          <ChevronDown className="w-6 h-6 text-muted-foreground animate-bounce" />
         </motion.div>
       </main>
+
+      {/* How it works */}
+      <section className="px-4 pb-24 flex flex-col items-center">
+        <h2 className="text-xl font-medium text-foreground mb-10">How it works</h2>
+        <div className="max-w-2xl w-full space-y-4">
+          {steps.map((step) => (
+            <motion.div
+              key={step.num}
+              className="card-dreamer flex gap-5 items-start"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: step.num * 0.1 }}
+            >
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-sm font-medium text-primary">{step.num}</span>
+              </div>
+              <div>
+                <h3 className="text-heading text-base mb-1">{step.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
