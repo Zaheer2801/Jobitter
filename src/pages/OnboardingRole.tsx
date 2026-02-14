@@ -132,12 +132,12 @@ const OnboardingRole = () => {
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 12 }}
             >
-              <Globe className="w-14 h-14 text-primary mb-6" />
+              <Globe className="w-10 h-10 text-primary mb-4" />
             </motion.div>
 
             <SplitText
               text="Where are you looking for jobs?"
-              className="text-heading text-2xl md:text-3xl lg:text-4xl leading-snug mb-3"
+              className="text-heading text-xl md:text-2xl lg:text-3xl leading-snug mb-2"
               delay={0.2}
               splitType="words"
               staggerDelay={0.06}
@@ -148,7 +148,7 @@ const OnboardingRole = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="text-muted-foreground mb-10"
+              className="text-muted-foreground text-sm mb-6"
             >
               We'll only show jobs from your selected country.
             </motion.p>
@@ -163,7 +163,7 @@ const OnboardingRole = () => {
               <button
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="w-full px-6 py-5 rounded-2xl bg-card border-2 border-border text-foreground text-base flex items-center justify-between hover:border-primary/40 transition-all duration-200"
+                className="w-full px-5 py-4 rounded-2xl bg-card border-2 border-border text-foreground text-sm flex items-center justify-between hover:border-primary/40 transition-all duration-200"
               >
                 <span className={country ? "text-foreground" : "text-muted-foreground/40"}>
                   {country || "Select a country..."}
@@ -176,7 +176,7 @@ const OnboardingRole = () => {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden"
+                  className="absolute bottom-full left-0 right-0 mb-2 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden"
                 >
                   <div className="p-3 border-b border-border">
                     <input
@@ -220,15 +220,15 @@ const OnboardingRole = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.3, duration: 0.5 }}
-              className="flex gap-3 mt-10 w-full max-w-sm"
+              className="flex gap-3 mt-6 w-full max-w-sm"
             >
-              <Button variant="outline" className="flex-1 rounded-2xl py-7 text-base" onClick={handleBack}>
+              <Button variant="outline" className="flex-1 rounded-2xl py-5 text-sm" onClick={handleBack}>
                 Back
               </Button>
               <Button
                 variant="hero"
                 size="lg"
-                className="flex-1 rounded-2xl py-7 text-base"
+                className="flex-1 rounded-2xl py-5 text-sm"
                 disabled={!country}
                 onClick={handleNext}
               >
