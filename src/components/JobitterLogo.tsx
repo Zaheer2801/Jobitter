@@ -1,4 +1,5 @@
 import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface JobitterLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -14,9 +15,13 @@ const sizeMap = {
 
 const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
   const s = sizeMap[size];
+  const navigate = useNavigate();
 
   return (
-    <span className={`inline-flex items-baseline ${s.gap} font-light tracking-tight text-foreground ${className}`}>
+    <span
+      onClick={() => navigate("/")}
+      className={`inline-flex items-baseline ${s.gap} font-light tracking-tight text-foreground cursor-pointer ${className}`}
+    >
       <span className={s.text}>JOBITT</span>
       <Bell
         size={s.bell}
