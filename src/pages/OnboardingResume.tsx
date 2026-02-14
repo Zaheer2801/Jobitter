@@ -148,18 +148,18 @@ const OnboardingResume = () => {
               exit={{ opacity: 0, scale: 0.95 }}
               className="w-full"
             >
-              <motion.div
+                <motion.div
                 initial={{ scale: 0, rotate: -30 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.1 }}
-                className="text-5xl md:text-6xl mb-8"
+                className="text-4xl mb-4"
               >
                 📄
               </motion.div>
 
               <SplitText
                 text="Now, let's see your resume:"
-                className="text-heading text-2xl md:text-3xl lg:text-4xl leading-snug mb-3"
+                className="text-heading text-xl md:text-2xl lg:text-3xl leading-snug mb-2"
                 delay={0.3}
                 splitType="words"
                 staggerDelay={0.07}
@@ -170,7 +170,7 @@ const OnboardingResume = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9 }}
-                className="text-muted-foreground mb-10"
+                className="text-muted-foreground text-sm mb-6"
               >
                 We'll extract your skills and experience to find perfect matches.
               </motion.p>
@@ -184,7 +184,7 @@ const OnboardingResume = () => {
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-3xl p-16 transition-all duration-300 cursor-pointer group ${
+                  className={`border-2 border-dashed rounded-2xl p-10 transition-all duration-300 cursor-pointer group ${
                     isDragging
                       ? "border-primary bg-primary/10 scale-[1.02] shadow-xl shadow-primary/10"
                       : "border-border/50 hover:border-primary/40 hover:bg-primary/5 hover:shadow-lg"
@@ -195,10 +195,10 @@ const OnboardingResume = () => {
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    <Upload className="w-14 h-14 text-muted-foreground/40 group-hover:text-primary mx-auto mb-4 transition-colors duration-300" />
+                    <Upload className="w-10 h-10 text-muted-foreground/40 group-hover:text-primary mx-auto mb-3 transition-colors duration-300" />
                   </motion.div>
-                  <p className="text-foreground font-semibold text-lg mb-1">Drag & drop your resume</p>
-                  <p className="text-muted-foreground text-sm">PDF or DOCX, up to 10MB</p>
+                  <p className="text-foreground font-semibold text-sm mb-1">Drag & drop your resume</p>
+                  <p className="text-muted-foreground text-xs">PDF or DOCX, up to 10MB</p>
                 </div>
                 <input
                   id="resume-input"
@@ -215,7 +215,7 @@ const OnboardingResume = () => {
                 transition={{ delay: 1.5 }}
                 className="mt-8"
               >
-                <Button variant="outline" className="rounded-2xl px-8 py-6 text-base" onClick={() => navigate("/onboarding/role")}>
+                <Button variant="outline" className="rounded-2xl px-8 py-5 text-sm" onClick={() => navigate("/onboarding/role")}>
                   Back
                 </Button>
               </motion.div>
@@ -444,14 +444,14 @@ const OnboardingResume = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
-                className="flex gap-3 mt-10"
+                className="flex gap-3 mt-6"
               >
-                <Button variant="outline" className="flex-1 rounded-2xl py-7 text-base" onClick={() => navigate("/onboarding/role")}>
+                <Button variant="outline" className="flex-1 rounded-2xl py-5 text-sm" onClick={() => navigate("/onboarding/role")}>
                   Back
                 </Button>
                 <Button
                   variant="hero"
-                  className="flex-1 rounded-2xl py-7 text-base"
+                  className="flex-1 rounded-2xl py-5 text-sm"
                   disabled={!profile}
                   onClick={handleNext}
                 >
