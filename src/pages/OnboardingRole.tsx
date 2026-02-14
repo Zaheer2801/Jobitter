@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useOnboarding } from "@/contexts/OnboardingContext";
 import OnboardingShell from "@/components/OnboardingShell";
+import AnimatedText from "@/components/AnimatedText";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Globe } from "lucide-react";
+import { ArrowRight, Globe } from "lucide-react";
 
 const countries = [
   "United States", "United Kingdom", "Canada", "Australia", "Germany",
@@ -43,101 +44,152 @@ const OnboardingRole = () => {
   if (step === "role") {
     return (
       <OnboardingShell step={1} totalSteps={3}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center text-center max-w-lg mx-auto"
-        >
-          <h2 className="text-heading text-2xl md:text-3xl mb-3">
-            👋 To start, share a current or previous role:
+        <div className="flex flex-col items-center text-center">
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.1 }}
+            className="text-5xl mb-6"
+          >
+            👋
+          </motion.div>
+
+          <h2 className="text-heading text-2xl md:text-3xl lg:text-4xl mb-8 leading-snug">
+            <AnimatedText text="To start, share a current or previous role:" delay={0.3} />
           </h2>
 
-          <input
-            type="text"
-            placeholder="e.g. Software Engineer, Teacher, Student..."
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full px-5 py-4 rounded-2xl border-none bg-accent/60 text-foreground text-lg placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 mb-6 mt-4"
-            autoFocus
-          />
-
-          <Button
-            variant="hero"
-            size="lg"
-            className="px-12 text-base"
-            disabled={!role.trim()}
-            onClick={handleNext}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.5 }}
+            className="w-full max-w-md"
           >
-            Next
-          </Button>
+            <input
+              type="text"
+              placeholder="e.g. Software Engineer, Teacher, Student..."
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-5 py-4 rounded-2xl border-none bg-primary/5 text-foreground text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 focus:bg-primary/10"
+              autoFocus
+            />
+          </motion.div>
 
-          <p className="text-xs text-muted-foreground mt-4">
-            💡 Have a specific job title? Enter it here for better matches.
-          </p>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.5 }}
+            className="mt-8"
+          >
+            <Button
+              variant="hero"
+              size="lg"
+              className="px-16 py-6 text-base rounded-2xl"
+              disabled={!role.trim()}
+              onClick={handleNext}
+            >
+              Next
+            </Button>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.5 }}
+            className="text-sm text-muted-foreground mt-6"
+          >
+            💡 Have a specific job title? Enter it for better matches.
+          </motion.p>
+        </div>
       </OnboardingShell>
     );
   }
 
+  // Country step
   return (
     <OnboardingShell step={1} totalSteps={3}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-lg mx-auto"
-      >
-        <h2 className="text-heading text-2xl md:text-3xl mb-2 flex items-center gap-2">
-          <Globe className="w-6 h-6 text-primary" />
-          Where are you looking for jobs?
-        </h2>
-        <p className="text-muted-foreground mb-6">
-          We'll only show jobs from your selected country.
-        </p>
+      <div className="flex flex-col items-center text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 12 }}
+        >
+          <Globe className="w-12 h-12 text-primary mb-4" />
+        </motion.div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <h2 className="text-heading text-2xl md:text-3xl lg:text-4xl mb-2 leading-snug">
+          <AnimatedText text="Where are you looking for jobs?" delay={0.2} />
+        </h2>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-muted-foreground mb-8"
+        >
+          We'll only show jobs from your selected country.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="flex flex-wrap gap-2 justify-center mb-6 max-w-md"
+        >
           {countries.map((c, i) => (
             <motion.button
               key={c}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.02 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1 + i * 0.03, duration: 0.3 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => { setCountry(country === c ? "" : c); setCustomCountry(""); }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+              className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-all duration-200 ${
                 country === c
-                  ? "bg-primary text-primary-foreground border-primary shadow-md"
+                  ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
                   : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-accent"
               }`}
             >
               {c}
             </motion.button>
           ))}
-        </div>
+        </motion.div>
 
-        <input
-          type="text"
-          placeholder="Or type your country..."
-          value={customCountry}
-          onChange={(e) => { setCustomCountry(e.target.value); setCountry(""); }}
-          className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring mb-6"
-        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          <input
+            type="text"
+            placeholder="Or type your country..."
+            value={customCountry}
+            onChange={(e) => { setCustomCountry(e.target.value); setCountry(""); }}
+            className="w-full px-5 py-4 rounded-2xl border-none bg-primary/5 text-foreground text-base placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 focus:bg-primary/10"
+          />
+        </motion.div>
 
-        <div className="flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={handleBack}>
-            <ArrowLeft className="w-4 h-4" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.8, duration: 0.5 }}
+          className="flex gap-3 mt-8 w-full max-w-sm"
+        >
+          <Button variant="outline" className="flex-1 rounded-2xl py-6" onClick={handleBack}>
             Back
           </Button>
           <Button
             variant="hero"
             size="lg"
-            className="flex-1"
+            className="flex-1 rounded-2xl py-6"
             disabled={!country && !customCountry}
             onClick={handleNext}
           >
             Next
             <ArrowRight className="w-4 h-4" />
           </Button>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </OnboardingShell>
   );
 };
