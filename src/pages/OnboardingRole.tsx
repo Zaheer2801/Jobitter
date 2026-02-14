@@ -70,7 +70,7 @@ const OnboardingRole = () => {
           >
             <SplitText
               text={`Nice to meet you, ${data.candidateName || "there"}! Share a current or previous role:`}
-              className="text-heading text-2xl md:text-3xl lg:text-4xl leading-snug mb-10"
+              className="text-heading text-lg md:text-xl leading-relaxed mb-10 font-normal text-muted-foreground"
               delay={0.3}
               splitType="words"
               staggerDelay={0.06}
