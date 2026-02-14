@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Sparkles, Compass, Zap, ChevronDown } from "lucide-react";
+import JobitterLogo from "@/components/JobitterLogo";
 
 const steps = [
   {
@@ -28,12 +29,7 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Nav */}
       <header className="w-full flex items-center justify-center py-4 border-b border-border bg-card/60 backdrop-blur-sm">
-        <div className="flex items-center gap-1">
-          <span className="text-lg font-normal text-foreground tracking-tight">career</span>
-          <span className="text-lg font-medium bg-gradient-to-r from-[hsl(199,89%,48%)] via-[hsl(168,76%,47%)] to-[hsl(85,72%,50%)] bg-clip-text text-transparent tracking-tight">
-            dreamer
-          </span>
-        </div>
+        <JobitterLogo size="sm" />
       </header>
 
       {/* Nav Pills */}
@@ -63,10 +59,7 @@ const Index = () => {
           className="max-w-2xl"
         >
           <h1 className="mb-5">
-            <span className="text-6xl md:text-7xl font-light text-foreground tracking-tight">career </span>
-            <span className="text-6xl md:text-7xl font-medium bg-gradient-to-r from-[hsl(199,89%,48%)] via-[hsl(168,76%,47%)] to-[hsl(85,72%,50%)] bg-clip-text text-transparent tracking-tight">
-              dreamer
-            </span>
+            <JobitterLogo size="xl" />
           </h1>
 
           <p className="text-muted-foreground text-lg mb-10">
