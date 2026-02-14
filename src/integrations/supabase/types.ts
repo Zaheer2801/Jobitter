@@ -26,6 +26,7 @@ export type Database = {
           role_title: string | null
           skills: string[]
           updated_at: string
+          user_id: string | null
           zapier_webhook_url: string | null
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           role_title?: string | null
           skills?: string[]
           updated_at?: string
+          user_id?: string | null
           zapier_webhook_url?: string | null
         }
         Update: {
@@ -52,7 +54,50 @@ export type Database = {
           role_title?: string | null
           skills?: string[]
           updated_at?: string
+          user_id?: string | null
           zapier_webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          preferred_country: string | null
+          role_title: string | null
+          skills: string[] | null
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          preferred_country?: string | null
+          role_title?: string | null
+          skills?: string[] | null
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          preferred_country?: string | null
+          role_title?: string | null
+          skills?: string[] | null
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

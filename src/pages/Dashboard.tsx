@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Bell, Search, Heart, ExternalLink, MapPin, DollarSign,
-  Briefcase, Filter, Star, TrendingUp, Settings, Loader2, RefreshCw,
-  MessageCircle, Check,
+  Briefcase, Star, TrendingUp, Loader2, RefreshCw,
+  MessageCircle, Check, LogOut, User,
 } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
 import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -26,6 +28,15 @@ interface Job {
   postedAgo: string;
   url: string;
   saved: boolean;
+}
+
+interface Profile {
+  display_name: string | null;
+  avatar_url: string | null;
+  email: string | null;
+  role_title: string | null;
+  preferred_country: string | null;
+  skills: string[];
 }
 
 const WhatsAppWebhookCard = () => {
@@ -94,14 +105,59 @@ const WhatsAppWebhookCard = () => {
 
 const Dashboard = () => {
   const { data } = useOnboarding();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [authLoading, user, navigate]);
+
+  // Fetch profile
+  useEffect(() => {
+    if (!user) return;
+    const fetchProfile = async () => {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (profileData) {
+        setProfile(profileData as unknown as Profile);
+      }
+    };
+    fetchProfile();
+  }, [user]);
+
+  // Save onboarding data to profile
+  useEffect(() => {
+    if (!user || !data.resumeProfile) return;
+    const updateProfile = async () => {
+      await supabase
+        .from("profiles")
+        .update({
+          role_title: data.currentRole,
+          preferred_country: data.preferredCountry,
+          skills: data.resumeProfile?.skills || [],
+          summary: data.resumeProfile?.summary || "",
+          display_name: data.candidateName || data.resumeProfile?.name || undefined,
+        })
+        .eq("user_id", user.id);
+    };
+    updateProfile();
+  }, [user, data.resumeProfile]);
 
   const fetchJobs = async () => {
     const positions = data.careerPaths.map((p) => p.role);
-    const skills = data.resumeProfile?.skills || [];
-    const country = data.preferredCountry || "";
+    const skills = profile?.skills?.length ? profile.skills : data.resumeProfile?.skills || [];
+    const country = profile?.preferred_country || data.preferredCountry || "";
 
     if (positions.length === 0) {
       toast.error("No positions found. Complete onboarding first.");
@@ -161,6 +217,18 @@ const Dashboard = () => {
   );
   const savedCount = jobs.filter((j) => j.saved).length;
 
+  const displayName = profile?.display_name || data.candidateName || user?.email?.split("@")[0] || "User";
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
+  const displaySkills = profile?.skills?.length ? profile.skills : data.resumeProfile?.skills || [];
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -174,10 +242,63 @@ const Dashboard = () => {
                 {jobs.length}
               </span>
             </div>
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-primary text-sm font-bold">
-                {data.resumeProfile?.name?.charAt(0)?.toUpperCase() || "U"}
-              </span>
+
+            {/* Profile avatar with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-2 focus:outline-none"
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={displayName}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-border"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-primary text-sm font-bold">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+                  <div className="p-4 border-b border-border">
+                    <div className="flex items-center gap-3">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={displayName} className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="w-5 h-5 text-primary" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      </div>
+                    </div>
+                    {profile?.role_title && (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <Briefcase className="w-3 h-3" />
+                        {profile.role_title}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={async () => {
+                      await signOut();
+                      navigate("/");
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm text-destructive hover:bg-accent/60 transition-colors flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -290,18 +411,41 @@ const Dashboard = () => {
 
         {/* Right panel */}
         <div className="hidden lg:block w-72 space-y-4">
+          {/* Profile card */}
+          <div className="card-dreamer p-5">
+            <div className="flex items-center gap-3 mb-4">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={displayName} className="w-12 h-12 rounded-full object-cover border-2 border-border" />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                <p className="text-xs text-muted-foreground truncate">{profile?.role_title || data.currentRole}</p>
+                {profile?.preferred_country && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3" />
+                    {profile.preferred_country}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="card-dreamer p-5">
             <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
               <TrendingUp className="w-4 h-4 text-primary" />
               Your Skills
             </h4>
-            {(data.resumeProfile?.skills || []).slice(0, 8).map((skill) => (
-              <div key={skill} className="mb-2">
-                <span className="text-foreground text-xs font-medium bg-accent px-2 py-1 rounded-md inline-block">
+            <div className="flex flex-wrap gap-1.5">
+              {displaySkills.slice(0, 10).map((skill) => (
+                <span key={skill} className="text-foreground text-xs font-medium bg-accent px-2.5 py-1 rounded-full">
                   {skill}
                 </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="card-dreamer p-5">
