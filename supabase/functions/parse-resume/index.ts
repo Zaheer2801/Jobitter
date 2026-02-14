@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import mammoth from "npm:mammoth@1.8.0";
+import pdfParse from "npm:pdf-parse@1.1.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,108 +8,37 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Extract readable text from base64-encoded file
-function extractTextFromBase64(base64: string, fileName: string): string {
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+async function extractText(base64: string, fileName: string): Promise<string> {
+  const buffer = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const lowerName = fileName.toLowerCase();
 
-  // For DOCX files, extract text from the XML inside the zip
-  if (fileName.endsWith(".docx") || fileName.endsWith(".doc")) {
-    return extractDocxText(bytes);
-  }
-
-  // For PDF files, extract visible text strings
-  if (fileName.endsWith(".pdf")) {
-    return extractPdfText(bytes);
-  }
-
-  // Plain text fallback
-  return new TextDecoder().decode(bytes);
-}
-
-function extractDocxText(bytes: Uint8Array): string {
-  // DOCX is a zip containing XML files. We look for word/document.xml
-  // Simple zip parser to find the document.xml content
-  try {
-    const text = new TextDecoder().decode(bytes);
-    // Find XML content between <w:t> tags (Word text elements)
-    const matches = text.match(/<w:t[^>]*>([^<]*)<\/w:t>/g);
-    if (matches && matches.length > 0) {
-      return matches
-        .map((m) => m.replace(/<[^>]+>/g, ""))
-        .join(" ")
-        .replace(/\s+/g, " ")
-        .trim();
+  if (lowerName.endsWith(".docx") || lowerName.endsWith(".doc")) {
+    try {
+      const result = await mammoth.extractRawText({ buffer: buffer.buffer });
+      console.log("Mammoth extracted text length:", result.value.length);
+      return result.value;
+    } catch (e) {
+      console.error("Mammoth error:", e);
+      throw new Error("Failed to parse DOCX file");
     }
-    // Fallback: extract any readable ASCII
-    return extractReadableText(bytes);
-  } catch {
-    return extractReadableText(bytes);
   }
-}
 
-function extractPdfText(bytes: Uint8Array): string {
-  try {
-    const text = new TextDecoder("latin1").decode(bytes);
-    const extracted: string[] = [];
-
-    // Extract text between BT (begin text) and ET (end text) operators
-    const btEtRegex = /BT\s([\s\S]*?)ET/g;
-    let match;
-    while ((match = btEtRegex.exec(text)) !== null) {
-      const block = match[1];
-      // Extract text from Tj, TJ, ', " operators
-      const tjMatches = block.match(/\(([^)]*)\)\s*Tj/g);
-      if (tjMatches) {
-        for (const tj of tjMatches) {
-          const content = tj.match(/\(([^)]*)\)/);
-          if (content) extracted.push(content[1]);
-        }
-      }
-      // TJ arrays
-      const tjArrayMatches = block.match(/\[([^\]]*)\]\s*TJ/g);
-      if (tjArrayMatches) {
-        for (const tja of tjArrayMatches) {
-          const parts = tja.match(/\(([^)]*)\)/g);
-          if (parts) {
-            for (const p of parts) {
-              const content = p.match(/\(([^)]*)\)/);
-              if (content) extracted.push(content[1]);
-            }
-          }
-        }
-      }
+  if (lowerName.endsWith(".pdf")) {
+    try {
+      const result = await pdfParse(Buffer.from(buffer));
+      console.log("PDF extracted text length:", result.text.length);
+      return result.text;
+    } catch (e) {
+      console.error("PDF parse error:", e);
+      throw new Error("Failed to parse PDF file");
     }
-
-    if (extracted.length > 0) {
-      return extracted
-        .join(" ")
-        .replace(/\\n/g, "\n")
-        .replace(/\\r/g, "")
-        .replace(/\\\(/g, "(")
-        .replace(/\\\)/g, ")")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-    // Fallback: extract readable strings
-    return extractReadableText(bytes);
-  } catch {
-    return extractReadableText(bytes);
   }
-}
 
-function extractReadableText(bytes: Uint8Array): string {
-  const text = new TextDecoder("latin1").decode(bytes);
-  // Extract sequences of readable characters (4+ chars)
-  const readable = text.match(/[\x20-\x7E]{4,}/g);
-  if (readable) {
-    return readable
-      .filter((s) => !s.match(/^[%\/\[\]{}()<>]+$/) && s.length > 4)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+  if (lowerName.endsWith(".txt")) {
+    return new TextDecoder().decode(buffer);
   }
-  return "";
+
+  throw new Error("Unsupported file format. Please upload PDF, DOCX, or TXT.");
 }
 
 serve(async (req) => {
@@ -132,34 +63,43 @@ serve(async (req) => {
         });
       }
 
-      const resumeText = extractTextFromBase64(fileBase64, fileName);
-      console.log("Extracted text length:", resumeText.length);
-      console.log("First 500 chars:", resumeText.substring(0, 500));
+      let resumeText: string;
+      try {
+        resumeText = await extractText(fileBase64, fileName);
+      } catch (e: any) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-      if (resumeText.length < 20) {
+      console.log("Extracted resume text (first 1000):", resumeText.substring(0, 1000));
+
+      if (resumeText.trim().length < 20) {
         return new Response(
-          JSON.stringify({ error: "Could not extract text from resume. Please try a different file format (.txt or .docx)." }),
+          JSON.stringify({ error: "Could not extract enough text from resume. Please try a different file." }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      systemPrompt = `You are an expert resume parser. Extract structured information from the resume text provided. The text may contain artifacts from file parsing - focus on extracting real content. Return data using the tool provided with these fields:
-- name: full name of the person
-- email: email address (if found, otherwise empty string)
-- phone: phone number (if found, otherwise empty string)
-- currentRole: current or most recent job title
-- experience: brief summary of total experience (e.g. "5 years in software engineering")
-- education: highest education (e.g. "BS Computer Science, MIT")
-- skills: array of technical and soft skills found
-- summary: a 2-3 sentence professional summary
+      systemPrompt = `You are an expert resume parser. Extract structured information from the resume text provided. Return data using the tool provided. Extract the ACTUAL person's real information — do NOT fabricate or guess any data. If a field is genuinely not found in the text, use an empty string for text fields or empty array for skills.
 
-Be thorough in extracting skills - include programming languages, tools, frameworks, methodologies, and soft skills. Extract the ACTUAL person's information, not fabricated data.`;
-      userPrompt = `Parse this resume text extracted from "${fileName}":\n\n${resumeText.substring(0, 8000)}`;
+Fields to extract:
+- name: full name
+- email: email address
+- phone: phone number
+- currentRole: current or most recent job title
+- experience: brief summary of total experience
+- education: highest education with degree and institution
+- skills: array of ALL technical and soft skills mentioned
+- summary: 2-3 sentence professional summary based on what's in the resume`;
+
+      userPrompt = `Parse this resume:\n\n${resumeText.substring(0, 10000)}`;
     } else if (action === "enhance") {
-      systemPrompt = `You are a career coach and resume optimization expert. Given the user's profile data, enhance each field for better market positioning. Make the summary more compelling, suggest additional relevant skills, and improve the experience description. Keep changes realistic and professional. Return the enhanced data using the tool provided.`;
+      systemPrompt = `You are a career coach and resume optimization expert. Given the user's profile data, enhance each field for better market positioning. Make the summary more compelling, suggest additional relevant skills based on their experience, and improve the experience description. Keep changes realistic and professional. Return the enhanced data using the tool provided.`;
       userPrompt = `Enhance this profile for better job market positioning. Current role context: ${currentRole || "not specified"}\n\nProfile:\n${JSON.stringify(profileData, null, 2)}`;
     } else if (action === "career-paths") {
-      systemPrompt = `You are a career advisor. Given the user's skills, experience, and current role, suggest 5 realistic career paths they could pursue. For each path, provide a match percentage (50-98) based on how well their current skills align. Return results using the tool provided. Be realistic with match percentages.`;
+      systemPrompt = `You are a career advisor. Given the user's skills, experience, and current role, suggest 5 realistic career paths they could pursue. For each path, provide a match percentage (50-98) based on how well their current skills align. Return results using the tool provided.`;
       userPrompt = `Based on this profile, suggest career paths:\nCurrent Role: ${currentRole}\nSkills: ${profileData?.skills?.join(", ")}\nExperience: ${profileData?.experience}\nEducation: ${profileData?.education}`;
     } else {
       return new Response(JSON.stringify({ error: "Invalid action" }), {
