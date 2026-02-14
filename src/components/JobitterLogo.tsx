@@ -29,7 +29,7 @@ const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
     <span
       onClick={() => navigate("/")}
       className={`inline-flex items-baseline tracking-tight text-foreground cursor-pointer select-none ${s.text} ${className}`}
-      style={{ perspective: "400px", fontFamily: "'Comfortaa', sans-serif", fontWeight: 700 }}
+      style={{ perspective: "400px", fontFamily: "'Nunito', sans-serif", fontWeight: 900 }}
     >
       JOBITT
       <AnimatePresence mode="wait">
