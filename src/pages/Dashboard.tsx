@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,7 @@ import {
   Briefcase, Star, TrendingUp, Loader2, RefreshCw,
   MessageCircle, Check, LogOut, User, X, Send, Mail, Zap,
 } from "lucide-react";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
+import { AnimatePresence } from "framer-motion";
 import JobitterLogo from "@/components/JobitterLogo";
 import { useOnboarding } from "@/contexts/OnboardingContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -116,12 +114,26 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
+  const [showPremiumBanner, setShowPremiumBanner] = useState(false);
+  const premiumDismissedRef = useRef(false);
 
-  // Show premium popup after 5 seconds
+  // Show premium banner after scrolling or 8s fallback, once per session
   useEffect(() => {
-    const timer = setTimeout(() => setShowPremiumPopup(true), 5000);
-    return () => clearTimeout(timer);
+    if (sessionStorage.getItem("premium_banner_dismissed")) return;
+    const handleScroll = () => {
+      if (premiumDismissedRef.current) return;
+      if (window.scrollY > 400) {
+        setShowPremiumBanner(true);
+        window.removeEventListener("scroll", handleScroll);
+      }
+    };
+    const timer = setTimeout(() => {
+      if (!premiumDismissedRef.current && !sessionStorage.getItem("premium_banner_dismissed")) {
+        setShowPremiumBanner(true);
+      }
+    }, 8000);
+    window.addEventListener("scroll", handleScroll);
+    return () => { window.removeEventListener("scroll", handleScroll); clearTimeout(timer); };
   }, []);
   // Redirect if not logged in
   useEffect(() => {
@@ -552,56 +564,71 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Premium Upsell Popup */}
-      <Dialog open={showPremiumPopup} onOpenChange={setShowPremiumPopup}>
-        <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border-primary/20">
-          <div className="bg-gradient-to-br from-primary/10 via-accent/40 to-primary/5 p-6">
-            <DialogHeader className="mb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="w-5 h-5 text-primary" />
-                <DialogTitle className="text-lg text-heading">Don't Miss Any Job!</DialogTitle>
-              </div>
-              <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                Get every new job listing sent directly to your preferred app — <strong>every hour</strong>, so you never miss an opportunity.
-              </DialogDescription>
-            </DialogHeader>
+      {/* Premium Slide-in Banner */}
+      <AnimatePresence>
+        {showPremiumBanner && (
+          <motion.div
+            initial={{ y: 200, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 200, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg"
+          >
+            <div className="bg-card border border-primary/20 rounded-2xl shadow-2xl p-5 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+              <button
+                onClick={() => {
+                  setShowPremiumBanner(false);
+                  premiumDismissedRef.current = true;
+                  sessionStorage.setItem("premium_banner_dismissed", "true");
+                }}
+                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
 
-            <div className="space-y-3 mb-5">
-              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
-                <MessageCircle className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-sm text-foreground">WhatsApp</span>
-              </div>
-              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
-                <Send className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-sm text-foreground">Telegram</span>
-              </div>
-              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
-                <Mail className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-sm text-foreground">Gmail</span>
+              <div className="flex items-start gap-4 relative">
+                <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-heading text-sm font-semibold mb-1">Don't miss any upcoming jobs!</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                    Get hourly job alerts sent directly to your WhatsApp, Telegram, or Gmail.
+                  </p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex -space-x-1">
+                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><MessageCircle className="w-3 h-3 text-primary" /></span>
+                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><Send className="w-3 h-3 text-primary" /></span>
+                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><Mail className="w-3 h-3 text-primary" /></span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">WhatsApp • Telegram • Gmail</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button variant="hero" size="sm" className="rounded-xl text-xs px-4" onClick={() => {
+                      toast.success("Premium coming soon! We'll notify you when it's ready.");
+                      setShowPremiumBanner(false);
+                      sessionStorage.setItem("premium_banner_dismissed", "true");
+                    }}>
+                      Try 7 days free — then $5.99/mo
+                    </Button>
+                    <button
+                      onClick={() => {
+                        setShowPremiumBanner(false);
+                        premiumDismissedRef.current = true;
+                        sessionStorage.setItem("premium_banner_dismissed", "true");
+                      }}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Later
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="text-center mb-4">
-              <p className="text-3xl font-bold text-foreground">$5.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-              <p className="text-xs text-muted-foreground mt-1">Hourly job alerts • Cancel anytime</p>
-            </div>
-
-            <Button variant="hero" className="w-full rounded-xl py-6 text-base font-semibold" onClick={() => {
-              toast.success("Premium coming soon! We'll notify you when it's ready.");
-              setShowPremiumPopup(false);
-            }}>
-              <Zap className="w-4 h-4 mr-2" />
-              Subscribe to Premium
-            </Button>
-            <button
-              onClick={() => setShowPremiumPopup(false)}
-              className="w-full text-center text-xs text-muted-foreground mt-3 hover:text-foreground transition-colors"
-            >
-              Maybe later
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
