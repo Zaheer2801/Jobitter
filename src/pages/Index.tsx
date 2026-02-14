@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Sparkles, Compass, Zap, ChevronDown } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
-import Prism from "@/components/Prism";
 
 const steps = [
   {
@@ -62,19 +61,6 @@ const Index = () => {
 
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-12 relative overflow-hidden">
-        {/* Prism Background */}
-        <div className="absolute inset-0 opacity-40 pointer-events-none">
-          <Prism
-            animationType="rotate"
-            scale={4}
-            glow={1.2}
-            noise={0}
-            transparent={true}
-            timeScale={0.3}
-            colorFrequency={1.2}
-            suspendWhenOffscreen
-          />
-        </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

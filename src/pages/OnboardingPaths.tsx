@@ -176,16 +176,16 @@ const OnboardingPaths = () => {
                   animate={{
                     opacity: 1,
                     scale: pos.scale,
-                    x: pos.x,
-                    y: pos.y,
+                    x: [pos.x - 8, pos.x + 8, pos.x - 5, pos.x + 5, pos.x - 8],
+                    y: [pos.y + 6, pos.y - 6, pos.y + 4, pos.y - 8, pos.y + 6],
                   }}
                   transition={{
-                    delay: 0.5 + i * 0.12,
-                    type: "spring",
-                    stiffness: 120,
-                    damping: 14,
+                    opacity: { delay: 0.5 + i * 0.12, duration: 0.4 },
+                    scale: { delay: 0.5 + i * 0.12, type: "spring", stiffness: 120, damping: 14 },
+                    x: { delay: 0.5 + i * 0.12, duration: 12 + i * 2, repeat: Infinity, ease: "easeInOut" },
+                    y: { delay: 0.5 + i * 0.12, duration: 10 + i * 1.5, repeat: Infinity, ease: "easeInOut" },
                   }}
-                  whileHover={{ scale: pos.scale * 1.15, zIndex: 10 }}
+                  whileHover={{ scale: 1.15, zIndex: 10 }}
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-default"
                   style={{ zIndex: isHighMatch ? 5 : 2 }}
                 >

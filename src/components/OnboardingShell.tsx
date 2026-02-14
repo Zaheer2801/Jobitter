@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
-import Prism from "@/components/Prism";
 
 interface OnboardingShellProps {
   step: number;
@@ -16,19 +15,6 @@ const OnboardingShell = ({ step, totalSteps, children }: OnboardingShellProps) =
 
   return (
     <div className="min-h-screen bg-accent/30 flex flex-col relative">
-      {/* Prism background */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <Prism
-          animationType="hover"
-          scale={5}
-          glow={0.8}
-          noise={0}
-          transparent={true}
-          timeScale={0.2}
-          hoverStrength={1.5}
-          suspendWhenOffscreen
-        />
-      </div>
       {/* Minimal header */}
       <header className="w-full flex items-center justify-between px-6 py-4 relative z-10">
         <button
