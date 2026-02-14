@@ -23,7 +23,7 @@ const OnboardingRole = () => {
   };
 
   return (
-    <OnboardingShell step={1} totalSteps={4}>
+    <OnboardingShell step={1} totalSteps={3}>
       <h2 className="text-heading text-2xl mb-2">What's your current role?</h2>
       <p className="text-muted-foreground mb-6">
         This helps us tailor career paths for you.
@@ -36,7 +36,7 @@ const OnboardingRole = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
-            onClick={() => { setSelected(role); setCustom(""); }}
+            onClick={() => { setSelected(selected === role ? "" : role); setCustom(""); }}
             className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
               selected === role
                 ? "bg-primary text-primary-foreground border-primary shadow-md"

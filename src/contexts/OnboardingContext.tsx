@@ -1,23 +1,33 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
+export interface ResumeProfile {
+  name: string;
+  email: string;
+  phone: string;
+  currentRole: string;
+  experience: string;
+  education: string;
+  skills: string[];
+  summary: string;
+}
+
+export interface CareerPath {
+  role: string;
+  match: number;
+  reason?: string;
+}
+
 export interface OnboardingData {
   currentRole: string;
   resumeFile: File | null;
-  resumeParsed: {
-    name: string;
-    skills: string[];
-    experience: string;
-    education: string;
-  } | null;
-  confirmedSkills: string[];
-  careerPaths: { role: string; match: number }[];
+  resumeProfile: ResumeProfile | null;
+  careerPaths: CareerPath[];
 }
 
 const defaultData: OnboardingData = {
   currentRole: "",
   resumeFile: null,
-  resumeParsed: null,
-  confirmedSkills: [],
+  resumeProfile: null,
   careerPaths: [],
 };
 
