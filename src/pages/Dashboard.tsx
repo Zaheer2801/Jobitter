@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ interface Profile {
   skills: string[];
 }
 
-const WhatsAppWebhookCard = () => {
+const WhatsAppWebhookCard = ({ isPremium }: { isPremium: boolean }) => {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -74,6 +74,29 @@ const WhatsAppWebhookCard = () => {
       setSaving(false);
     }
   };
+
+  if (!isPremium) {
+    return (
+      <div className="card-dreamer p-5 border-primary/20 bg-accent/50 relative overflow-hidden opacity-80">
+        <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center rounded-3xl">
+          <span className="text-lg mb-1">🔒</span>
+          <p className="text-xs font-semibold text-foreground">Premium Feature</p>
+          <p className="text-[10px] text-muted-foreground">Upgrade to unlock</p>
+        </div>
+        <h4 className="text-heading text-sm flex items-center gap-2 mb-2">
+          <MessageCircle className="w-4 h-4 text-primary" />
+          WhatsApp Alerts
+        </h4>
+        <p className="text-xs text-muted-foreground mb-3">
+          Get hourly job alerts on WhatsApp via Zapier.
+        </p>
+        <div className="space-y-2">
+          <Input placeholder="https://hooks.zapier.com/..." disabled className="text-xs" />
+          <Button variant="hero" size="sm" className="w-full" disabled>Enable WhatsApp Alerts</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="card-dreamer p-5 border-primary/20 bg-accent/50">
@@ -115,27 +138,22 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showPremiumBanner, setShowPremiumBanner] = useState(false);
-  const premiumDismissedRef = useRef(false);
+  const [isPremium, setIsPremium] = useState(false);
 
-  // Show premium banner after scrolling or 8s fallback, once per session
+  // Check premium status
   useEffect(() => {
-    if (sessionStorage.getItem("premium_banner_dismissed")) return;
-    const handleScroll = () => {
-      if (premiumDismissedRef.current) return;
-      if (window.scrollY > 400) {
-        setShowPremiumBanner(true);
-        window.removeEventListener("scroll", handleScroll);
-      }
+    if (!user) return;
+    const checkPremium = async () => {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "premium");
+      setIsPremium(!!(roles && roles.length > 0));
     };
-    const timer = setTimeout(() => {
-      if (!premiumDismissedRef.current && !sessionStorage.getItem("premium_banner_dismissed")) {
-        setShowPremiumBanner(true);
-      }
-    }, 8000);
-    window.addEventListener("scroll", handleScroll);
-    return () => { window.removeEventListener("scroll", handleScroll); clearTimeout(timer); };
-  }, []);
+    checkPremium();
+  }, [user]);
+
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
@@ -562,75 +580,50 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">jobs saved</p>
           </div>
 
-          <WhatsAppWebhookCard />
+          <WhatsAppWebhookCard isPremium={isPremium} />
         </div>
       </div>
 
-      {/* Premium Slide-in Banner */}
-      <AnimatePresence>
-        {showPremiumBanner && (
-          <motion.div
-            initial={{ y: 200, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 200, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg"
-          >
-            <div className="bg-card border border-primary/20 rounded-2xl shadow-2xl p-5 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
-              <button
-                onClick={() => {
-                  setShowPremiumBanner(false);
-                  premiumDismissedRef.current = true;
-                  sessionStorage.setItem("premium_banner_dismissed", "true");
-                }}
-                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="flex items-start gap-4 relative">
-                <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-primary" />
+      {/* Persistent Premium Banner — bottom-left */}
+      {!isPremium && (
+        <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 2, type: "spring", stiffness: 200, damping: 20 }}
+          className="fixed bottom-4 left-4 z-50 w-72"
+        >
+          <div className="bg-card border border-primary/20 rounded-2xl shadow-2xl p-4 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-primary" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-heading text-sm font-semibold mb-1">Don't miss any upcoming jobs!</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                    Get hourly job alerts sent directly to your WhatsApp, Telegram, or Gmail.
-                  </p>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex -space-x-1">
-                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><MessageCircle className="w-3 h-3 text-primary" /></span>
-                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><Send className="w-3 h-3 text-primary" /></span>
-                      <span className="w-6 h-6 rounded-full bg-accent flex items-center justify-center"><Mail className="w-3 h-3 text-primary" /></span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">WhatsApp • Telegram • Gmail</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button variant="hero" size="sm" className="rounded-xl text-xs px-4" onClick={() => {
-                      toast.success("Premium coming soon! We'll notify you when it's ready.");
-                      setShowPremiumBanner(false);
-                      sessionStorage.setItem("premium_banner_dismissed", "true");
-                    }}>
-                      Try 7 days free — then $5.99/mo
-                    </Button>
-                    <button
-                      onClick={() => {
-                        setShowPremiumBanner(false);
-                        premiumDismissedRef.current = true;
-                        sessionStorage.setItem("premium_banner_dismissed", "true");
-                      }}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      Later
-                    </button>
-                  </div>
-                </div>
+                <h4 className="text-heading text-xs font-semibold">Go Premium</h4>
               </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                Unlock WhatsApp alerts, hourly job scraping & more.
+              </p>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex -space-x-1">
+                  <span className="w-5 h-5 rounded-full bg-accent flex items-center justify-center"><MessageCircle className="w-2.5 h-2.5 text-primary" /></span>
+                  <span className="w-5 h-5 rounded-full bg-accent flex items-center justify-center"><Send className="w-2.5 h-2.5 text-primary" /></span>
+                  <span className="w-5 h-5 rounded-full bg-accent flex items-center justify-center"><Mail className="w-2.5 h-2.5 text-primary" /></span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">WhatsApp • Telegram • Gmail</span>
+              </div>
+              <Button
+                variant="hero"
+                size="sm"
+                className="w-full rounded-xl text-xs"
+                onClick={() => toast.success("Premium coming soon! We'll notify you when it's ready.")}
+              >
+                Try 7 days free — $5.99/mo
+              </Button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
