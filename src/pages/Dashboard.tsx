@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Bell, Search, Heart, ExternalLink, MapPin, DollarSign,
   Briefcase, Filter, Star, TrendingUp, Settings, Loader2, RefreshCw,
+  MessageCircle, Check,
 } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
 import { useOnboarding } from "@/contexts/OnboardingContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const SCRAPE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-jobs`;
@@ -24,6 +27,70 @@ interface Job {
   url: string;
   saved: boolean;
 }
+
+const WhatsAppWebhookCard = () => {
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const saveWebhook = async () => {
+    if (!webhookUrl.trim()) {
+      toast.error("Please enter your Zapier webhook URL");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: profiles } = await supabase
+        .from("job_alert_profiles")
+        .select("id")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (profiles && profiles.length > 0) {
+        await supabase
+          .from("job_alert_profiles")
+          .update({ zapier_webhook_url: webhookUrl })
+          .eq("id", profiles[0].id);
+      }
+      setSaved(true);
+      toast.success("WhatsApp alerts enabled! You'll get hourly job notifications.");
+    } catch (e) {
+      toast.error("Failed to save webhook URL");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="card-dreamer p-5 border-primary/20 bg-accent/50">
+      <h4 className="text-heading text-sm flex items-center gap-2 mb-2">
+        <MessageCircle className="w-4 h-4 text-primary" />
+        WhatsApp Alerts
+      </h4>
+      <p className="text-xs text-muted-foreground mb-3">
+        Get hourly job alerts on WhatsApp via Zapier.
+      </p>
+      {saved ? (
+        <div className="flex items-center gap-2 text-success text-sm">
+          <Check className="w-4 h-4" />
+          <span>Alerts active — checking every hour!</span>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <Input
+            placeholder="https://hooks.zapier.com/..."
+            value={webhookUrl}
+            onChange={(e) => setWebhookUrl(e.target.value)}
+            className="text-xs"
+          />
+          <Button variant="hero" size="sm" className="w-full" onClick={saveWebhook} disabled={saving}>
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Enable WhatsApp Alerts"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Dashboard = () => {
   const { data } = useOnboarding();
@@ -258,15 +325,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">jobs saved</p>
           </div>
 
-          <div className="card-dreamer p-5 border-primary/20 bg-accent/50">
-            <h4 className="text-heading text-sm mb-2">💰 Go Pro</h4>
-            <p className="text-xs text-muted-foreground mb-3">
-              Unlimited alerts, WhatsApp notifications, priority matches.
-            </p>
-            <Button variant="hero" size="sm" className="w-full">
-              $19/month
-            </Button>
-          </div>
+          <WhatsAppWebhookCard />
         </div>
       </div>
     </div>
