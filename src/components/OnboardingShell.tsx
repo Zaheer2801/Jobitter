@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
 
 interface OnboardingShellProps {
@@ -11,21 +9,11 @@ interface OnboardingShellProps {
 }
 
 const OnboardingShell = ({ step, totalSteps, children }: OnboardingShellProps) => {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-accent/30 flex flex-col relative">
       {/* Minimal header */}
-      <header className="w-full flex items-center justify-between px-6 py-4 relative z-10">
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm">Home</span>
-        </button>
+      <header className="w-full flex items-center justify-center px-6 py-4 relative z-10">
         <JobitterLogo size="sm" />
-        <div className="w-16" />
       </header>
 
       {/* Progress bar - thin at top */}
