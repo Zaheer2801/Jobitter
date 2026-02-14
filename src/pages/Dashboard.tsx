@@ -7,8 +7,11 @@ import { motion } from "framer-motion";
 import {
   Bell, Search, Heart, ExternalLink, MapPin, DollarSign,
   Briefcase, Star, TrendingUp, Loader2, RefreshCw,
-  MessageCircle, Check, LogOut, User,
+  MessageCircle, Check, LogOut, User, X, Send, Mail, Zap,
 } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import JobitterLogo from "@/components/JobitterLogo";
 import { useOnboarding } from "@/contexts/OnboardingContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -113,7 +116,13 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
 
+  // Show premium popup after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowPremiumPopup(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
@@ -542,6 +551,57 @@ const Dashboard = () => {
           <WhatsAppWebhookCard />
         </div>
       </div>
+
+      {/* Premium Upsell Popup */}
+      <Dialog open={showPremiumPopup} onOpenChange={setShowPremiumPopup}>
+        <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border-primary/20">
+          <div className="bg-gradient-to-br from-primary/10 via-accent/40 to-primary/5 p-6">
+            <DialogHeader className="mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="w-5 h-5 text-primary" />
+                <DialogTitle className="text-lg text-heading">Don't Miss Any Job!</DialogTitle>
+              </div>
+              <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
+                Get every new job listing sent directly to your preferred app — <strong>every hour</strong>, so you never miss an opportunity.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 mb-5">
+              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
+                <MessageCircle className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm text-foreground">WhatsApp</span>
+              </div>
+              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
+                <Send className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm text-foreground">Telegram</span>
+              </div>
+              <div className="flex items-center gap-3 bg-card/80 rounded-xl px-4 py-3 border border-border/50">
+                <Mail className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm text-foreground">Gmail</span>
+              </div>
+            </div>
+
+            <div className="text-center mb-4">
+              <p className="text-3xl font-bold text-foreground">$5.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+              <p className="text-xs text-muted-foreground mt-1">Hourly job alerts • Cancel anytime</p>
+            </div>
+
+            <Button variant="hero" className="w-full rounded-xl py-6 text-base font-semibold" onClick={() => {
+              toast.success("Premium coming soon! We'll notify you when it's ready.");
+              setShowPremiumPopup(false);
+            }}>
+              <Zap className="w-4 h-4 mr-2" />
+              Subscribe to Premium
+            </Button>
+            <button
+              onClick={() => setShowPremiumPopup(false)}
+              className="w-full text-center text-xs text-muted-foreground mt-3 hover:text-foreground transition-colors"
+            >
+              Maybe later
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
