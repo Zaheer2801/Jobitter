@@ -1,14 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useOnboarding, CareerPath } from "@/contexts/OnboardingContext";
-import OnboardingShell from "@/components/OnboardingShell";
+import SplitText from "@/components/SplitText";
 import { motion } from "framer-motion";
-import { Rocket, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import JobitterLogo from "@/components/JobitterLogo";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-resume`;
+
+// Generate scattered positions for bubbles around a center point
+const generatePositions = (count: number) => {
+  const positions: { x: number; y: number; scale: number }[] = [];
+  const angleStep = (2 * Math.PI) / count;
+
+  for (let i = 0; i < count; i++) {
+    const angle = angleStep * i + (Math.random() - 0.5) * 0.8;
+    const radius = 160 + Math.random() * 140;
+    positions.push({
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+      scale: 0.8 + Math.random() * 0.4,
+    });
+  }
+  return positions;
+};
 
 const OnboardingPaths = () => {
   const navigate = useNavigate();
@@ -56,146 +74,222 @@ const OnboardingPaths = () => {
     }
   };
 
-  const positions = [
-    { x: 0, y: -90, ring: 1 },
-    { x: 85, y: -28, ring: 1 },
-    { x: 53, y: 73, ring: 2 },
-    { x: -53, y: 73, ring: 2 },
-    { x: -85, y: -28, ring: 2 },
-  ];
+  const bubblePositions = useMemo(() => generatePositions(paths.length || 5), [paths.length]);
+
+  const getMatchColor = (match: number) => {
+    if (match >= 90) return "bg-primary text-primary-foreground";
+    if (match >= 80) return "bg-primary/80 text-primary-foreground";
+    return "bg-card text-foreground border border-border";
+  };
+
+  const getDotColor = (match: number) => {
+    if (match >= 85) return "bg-success";
+    return "bg-primary";
+  };
 
   return (
-    <OnboardingShell step={3} totalSteps={3}>
-      <h2 className="text-heading text-2xl mb-2 text-center">Positions You Can Apply For</h2>
-      <p className="text-muted-foreground text-center mb-6">Specific roles matching your skills and experience</p>
+    <div className="min-h-screen bg-accent/20 flex flex-col">
+      {/* Header */}
+      <header className="w-full flex items-center justify-between px-6 py-4">
+        <button
+          onClick={() => navigate("/onboarding/resume")}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <JobitterLogo size="sm" />
+        <div className="w-8" />
+      </header>
+
+      {/* Progress */}
+      <div className="h-1 bg-secondary">
+        <motion.div
+          className="h-full bg-primary"
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        />
+      </div>
 
       {loading ? (
-        <div className="flex flex-col items-center py-12">
-          <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-          <p className="text-foreground font-medium">AI is analyzing your profile...</p>
-          <p className="text-muted-foreground text-sm mt-1">Finding the best career paths for you</p>
-        </div>
-      ) : paths.length > 0 ? (
-        <>
-          {/* Radar visualization */}
-          <div className="relative w-72 h-72 mx-auto mb-4">
-            {[1, 2, 3].map((ring) => (
-              <div
-                key={ring}
-                className="absolute rounded-full border border-border"
-                style={{
-                  width: `${ring * 33}%`,
-                  height: `${ring * 33}%`,
-                  top: `${50 - (ring * 33) / 2}%`,
-                  left: `${50 - (ring * 33) / 2}%`,
-                }}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex gap-3 mb-8">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                className="w-4 h-4 rounded-full bg-primary"
               />
             ))}
-
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <Rocket className="w-6 h-6 text-primary" />
-              </div>
+          </div>
+          <SplitText
+            text="AI is finding your career paths..."
+            className="text-heading text-xl md:text-2xl"
+            splitType="words"
+            staggerDelay={0.08}
+            tag="h3"
+          />
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-muted-foreground text-sm mt-3"
+          >
+            Analyzing your skills and experience
+          </motion.p>
+        </div>
+      ) : paths.length > 0 ? (
+        <div className="flex-1 flex flex-col">
+          {/* Scatter visualization - full width */}
+          <div className="relative w-full h-[500px] md:h-[550px] overflow-hidden">
+            {/* Central glowing orb */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="relative"
+              >
+                {/* Outer glow */}
+                <div className="w-48 h-48 rounded-full bg-gradient-radial from-primary/10 via-primary/5 to-transparent absolute -inset-8" />
+                {/* Inner circle */}
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/5 via-accent/40 to-primary/10 border border-primary/10 flex flex-col items-center justify-center shadow-2xl shadow-primary/10 backdrop-blur-sm">
+                  <p className="text-muted-foreground text-xs font-medium">Explore paths</p>
+                  <p className="text-muted-foreground text-xs">based on...</p>
+                  <div className="flex gap-1 mt-2 text-lg">🎓💪</div>
+                </div>
+              </motion.div>
             </div>
 
-            {paths.slice(0, 5).map((path, i) => {
-              const pos = positions[i];
+            {/* Scattered career bubbles */}
+            {paths.map((path, i) => {
+              const pos = bubblePositions[i];
+              if (!pos) return null;
+              const isHighMatch = path.match >= 85;
+
               return (
                 <motion.div
                   key={path.role}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.15, type: "spring", stiffness: 200 }}
-                  className="absolute flex flex-col items-center"
-                  style={{
-                    left: `calc(50% + ${pos.x * 1.3}px)`,
-                    top: `calc(50% + ${pos.y * 1.3}px)`,
-                    transform: "translate(-50%, -50%)",
+                  initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                  animate={{
+                    opacity: 1,
+                    scale: pos.scale,
+                    x: pos.x,
+                    y: pos.y,
                   }}
+                  transition={{
+                    delay: 0.5 + i * 0.12,
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 14,
+                  }}
+                  whileHover={{ scale: pos.scale * 1.15, zIndex: 10 }}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-default"
+                  style={{ zIndex: isHighMatch ? 5 : 2 }}
                 >
-                  <div
-                    className={`rounded-2xl px-3 py-2 shadow-md border text-center transition-all hover:scale-105 cursor-default ${
-                      path.match >= 85
-                        ? "bg-primary text-primary-foreground border-primary glow-primary"
-                        : path.match >= 70
-                        ? "bg-card text-foreground border-primary/30"
-                        : "bg-card text-foreground border-border"
-                    }`}
-                  >
-                    <p className="text-xs font-semibold whitespace-nowrap">{path.role}</p>
-                    <p className={`text-[10px] font-bold mt-0.5 ${
-                      path.match >= 85 ? "text-primary-foreground/80" : "text-primary"
-                    }`}>
-                      {path.match}%
-                    </p>
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${getDotColor(path.match)}`} />
+                    <span className="text-foreground text-sm font-medium">{path.role}</span>
                   </div>
                 </motion.div>
               );
             })}
+
+            {/* Legend */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5 }}
+              className="absolute bottom-4 left-6 flex gap-4"
+            >
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                Database result
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="w-2.5 h-2.5 rounded-full bg-success" />
+                AI result
+              </div>
+            </motion.div>
           </div>
 
-          {/* Path details */}
-          <div className="space-y-2 mb-4">
-            {paths.map((path, i) => (
-              <motion.div
-                key={path.role}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-                className="flex items-center gap-3 bg-accent/50 rounded-xl px-3 py-2"
+          {/* Path details list */}
+          <div className="max-w-2xl mx-auto w-full px-6 pb-8">
+            <div className="space-y-1">
+              {paths
+                .sort((a, b) => b.match - a.match)
+                .map((path, i) => (
+                  <motion.div
+                    key={path.role}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 + i * 0.08, type: "spring", stiffness: 200 }}
+                    className="flex items-start gap-4 py-3.5 border-b border-border/40 last:border-0 group hover:bg-accent/30 px-3 rounded-xl transition-colors"
+                  >
+                    <span className={`text-lg font-bold min-w-[48px] tabular-nums ${
+                      path.match >= 90 ? "text-primary" : path.match >= 80 ? "text-primary/70" : "text-muted-foreground"
+                    }`}>
+                      {path.match}%
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{path.role}</p>
+                      {path.reason && (
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{path.reason}</p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
+
+            {/* Navigation */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5 }}
+              className="flex gap-3 mt-8"
+            >
+              <Button
+                variant="outline"
+                className="flex-1 rounded-2xl py-7 text-base"
+                onClick={() => navigate("/onboarding/resume")}
               >
-                <span className={`text-sm font-bold min-w-[40px] ${
-                  path.match >= 85 ? "text-primary" : path.match >= 70 ? "text-success" : "text-muted-foreground"
-                }`}>{path.match}%</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{path.role}</p>
-                  {path.reason && (
-                    <p className="text-xs text-muted-foreground truncate">{path.reason}</p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+              <Button
+                variant="hero"
+                className="flex-1 rounded-2xl py-7 text-base"
+                disabled={paths.length === 0}
+                onClick={async () => {
+                  try {
+                    await supabase.from("job_alert_profiles").insert({
+                      positions: paths.map((p) => p.role),
+                      skills: data.resumeProfile?.skills || [],
+                      role_title: data.currentRole,
+                      preferred_country: data.preferredCountry || null,
+                    });
+                  } catch (e) {
+                    console.error("Failed to save profile:", e);
+                  }
+                  navigate("/dashboard");
+                }}
+              >
+                Start Getting Jobs
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </motion.div>
           </div>
-        </>
+        </div>
       ) : (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">No career paths generated yet.</p>
-          <Button variant="outline" className="mt-4" onClick={fetchPaths}>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <p className="text-muted-foreground mb-4">No career paths generated yet.</p>
+          <Button variant="hero" onClick={fetchPaths} className="rounded-2xl px-10 py-6">
             Generate Paths
           </Button>
         </div>
       )}
-
-      {/* Navigation */}
-      <div className="flex gap-3">
-        <Button variant="outline" className="flex-1" onClick={() => navigate("/onboarding/resume")}>
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Button>
-        <Button
-          variant="hero"
-          className="flex-1"
-          disabled={paths.length === 0}
-          onClick={async () => {
-            // Save profile to DB for cron job alerts
-            try {
-              await supabase.from("job_alert_profiles").insert({
-                positions: paths.map((p) => p.role),
-                skills: data.resumeProfile?.skills || [],
-                role_title: data.currentRole,
-                preferred_country: data.preferredCountry || null,
-              });
-            } catch (e) {
-              console.error("Failed to save profile:", e);
-            }
-            navigate("/dashboard");
-          }}
-        >
-          Start Getting Jobs
-          <ArrowRight className="w-4 h-4" />
-        </Button>
-      </div>
-    </OnboardingShell>
+    </div>
   );
 };
 
