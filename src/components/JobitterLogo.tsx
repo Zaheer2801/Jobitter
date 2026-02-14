@@ -1,7 +1,16 @@
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
+const bellColors = [
+  "hsl(152, 68%, 42%)", // primary green
+  "hsl(34, 95%, 55%)",  // warm orange
+  "hsl(340, 75%, 55%)", // vibrant pink
+  "hsl(210, 85%, 55%)", // bright blue
+  "hsl(280, 70%, 55%)", // purple
+  "hsl(45, 95%, 55%)",  // golden yellow
+];
 
 interface JobitterLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -19,11 +28,21 @@ const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
   const s = sizeMap[size];
   const navigate = useNavigate();
   const [showBell, setShowBell] = useState(true);
+  const [colorIndex, setColorIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => setShowBell((prev) => !prev), 2500);
+    const interval = setInterval(() => {
+      setShowBell((prev) => {
+        if (prev) return false; // switching to E
+        // switching to bell — pick next color
+        setColorIndex((ci) => (ci + 1) % bellColors.length);
+        return true;
+      });
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
+
+  const bellColor = bellColors[colorIndex];
 
   return (
     <span
@@ -50,9 +69,9 @@ const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
             >
               <Bell
                 size={s.bell}
-                className="text-foreground fill-foreground"
+                className="transition-colors duration-300"
                 strokeWidth={1.5}
-                style={{ verticalAlign: "baseline", marginBottom: "-0.1em" }}
+                style={{ verticalAlign: "baseline", marginBottom: "-0.1em", color: bellColor, fill: bellColor }}
               />
             </motion.span>
           </motion.span>
