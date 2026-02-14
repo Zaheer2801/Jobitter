@@ -14,9 +14,9 @@ const OnboardingShell = ({ step, totalSteps, children }: OnboardingShellProps) =
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header with logo */}
-      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-border bg-card/60 backdrop-blur-sm">
+    <div className="min-h-screen bg-accent/30 flex flex-col">
+      {/* Minimal header */}
+      <header className="w-full flex items-center justify-between px-6 py-4">
         <button
           onClick={() => navigate("/")}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -25,37 +25,28 @@ const OnboardingShell = ({ step, totalSteps, children }: OnboardingShellProps) =
           <span className="text-sm">Home</span>
         </button>
         <JobitterLogo size="sm" />
-        <div className="w-16" /> {/* Spacer for centering */}
+        <div className="w-16" />
       </header>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        {/* Progress */}
-        <div className="w-full max-w-md mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground font-medium">
-              Step {step} of {totalSteps}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {Math.round((step / totalSteps) * 100)}%
-            </span>
-          </div>
-          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-primary rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${(step / totalSteps) * 100}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            />
-          </div>
+      {/* Progress bar - thin at top */}
+      <div className="w-full px-0">
+        <div className="h-1 bg-secondary">
+          <motion.div
+            className="h-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${(step / totalSteps) * 100}%` }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
         </div>
+      </div>
 
-        {/* Card */}
+      {/* Full-screen centered content */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
         <motion.div
-          className="card-dreamer w-full max-w-lg"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="w-full max-w-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
         >
           {children}
         </motion.div>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useOnboarding, ResumeProfile } from "@/contexts/OnboardingContext";
 import OnboardingShell from "@/components/OnboardingShell";
+import AnimatedText from "@/components/AnimatedText";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, CheckCircle2, FileText, ArrowRight, X, Plus, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,7 +25,7 @@ const OnboardingResume = () => {
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
-        resolve(result.split(",")[1]); // strip data:...;base64, prefix
+        resolve(result.split(",")[1]);
       };
       reader.onerror = reject;
       reader.readAsDataURL(f);
@@ -137,200 +138,283 @@ const OnboardingResume = () => {
 
   return (
     <OnboardingShell step={2} totalSteps={3}>
-      <h2 className="text-heading text-2xl mb-2">Upload your resume</h2>
-      <p className="text-muted-foreground mb-6">
-        We'll extract your skills and experience to find perfect matches.
-      </p>
-
-      <AnimatePresence mode="wait">
-        {!file ? (
-          <motion.div
-            key="upload"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-200 cursor-pointer ${
-                isDragging
-                  ? "border-primary bg-accent"
-                  : "border-border hover:border-primary/40"
-              }`}
-              onClick={() => document.getElementById("resume-input")?.click()}
+      <div className="flex flex-col items-center text-center">
+        <AnimatePresence mode="wait">
+          {!file ? (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full"
             >
-              <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
-              <p className="text-foreground font-medium mb-1">Drag & drop your resume</p>
-              <p className="text-muted-foreground text-sm">PDF or DOCX, up to 10MB</p>
-            </div>
-            <input
-              id="resume-input"
-              type="file"
-              accept=".pdf,.docx,.doc,.txt"
-              className="hidden"
-              onChange={handleFileInput}
-            />
-          </motion.div>
-        ) : parsing ? (
-          <motion.div
-            key="parsing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-center py-8"
-          >
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-foreground font-medium">AI is parsing your resume...</p>
-            <p className="text-muted-foreground text-sm mt-1">{file.name}</p>
-          </motion.div>
-        ) : profile ? (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            {/* Success banner */}
-            <div className="flex items-center gap-3 bg-accent rounded-xl p-3">
-              <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-foreground text-sm font-medium">Resume parsed!</p>
-                <p className="text-muted-foreground text-xs flex items-center gap-1 truncate">
-                  <FileText className="w-3 h-3 flex-shrink-0" />
-                  {file?.name}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEnhance}
-                disabled={enhancing}
-                className="flex-shrink-0"
+              <motion.div
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.1 }}
+                className="text-5xl mb-6"
               >
-                {enhancing ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Sparkles className="w-3.5 h-3.5" />
-                )}
-                {enhancing ? "Enhancing..." : "AI Enhance"}
-              </Button>
-            </div>
+                📄
+              </motion.div>
 
-            {/* Editable fields */}
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Name</label>
+              <h2 className="text-heading text-2xl md:text-3xl lg:text-4xl mb-3 leading-snug">
+                <AnimatedText text="Now, let's see your resume:" delay={0.3} />
+              </h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+                className="text-muted-foreground mb-8"
+              >
+                We'll extract your skills and experience to find perfect matches.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.1, duration: 0.5 }}
+              >
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-3xl p-16 transition-all duration-300 cursor-pointer group ${
+                    isDragging
+                      ? "border-primary bg-primary/10 scale-[1.02]"
+                      : "border-border/60 hover:border-primary/40 hover:bg-primary/5"
+                  }`}
+                  onClick={() => document.getElementById("resume-input")?.click()}
+                >
+                  <motion.div
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Upload className="w-12 h-12 text-muted-foreground/60 group-hover:text-primary mx-auto mb-4 transition-colors" />
+                  </motion.div>
+                  <p className="text-foreground font-medium text-lg mb-1">Drag & drop your resume</p>
+                  <p className="text-muted-foreground text-sm">PDF or DOCX, up to 10MB</p>
+                </div>
                 <input
-                  type="text"
-                  value={profile.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  id="resume-input"
+                  type="file"
+                  accept=".pdf,.docx,.doc,.txt"
+                  className="hidden"
+                  onChange={handleFileInput}
                 />
-              </div>
+              </motion.div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Email</label>
-                  <input
-                    type="email"
-                    value={profile.email || ""}
-                    onChange={(e) => updateField("email", e.target.value)}
-                    placeholder="your@email.com"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="mt-6"
+              >
+                <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/onboarding/role")}>
+                  Back
+                </Button>
+              </motion.div>
+            </motion.div>
+          ) : parsing ? (
+            <motion.div
+              key="parsing"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="py-16"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full mx-auto mb-6"
+              />
+              <h3 className="text-heading text-xl mb-2">
+                <AnimatedText text="AI is reading your resume..." delay={0.2} />
+              </h3>
+              <p className="text-muted-foreground text-sm">{file.name}</p>
+            </motion.div>
+          ) : profile ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full text-left"
+            >
+              {/* Success banner */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center gap-3 bg-primary/5 rounded-2xl p-4 mb-6"
+              >
+                <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground font-medium">Resume parsed!</p>
+                  <p className="text-muted-foreground text-xs flex items-center gap-1 truncate">
+                    <FileText className="w-3 h-3 flex-shrink-0" />
+                    {file?.name}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEnhance}
+                  disabled={enhancing}
+                  className="flex-shrink-0 rounded-xl"
+                >
+                  {enhancing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3.5 h-3.5" />
+                  )}
+                  {enhancing ? "Enhancing..." : "AI Enhance"}
+                </Button>
+              </motion.div>
+
+              {/* Editable fields */}
+              <div className="space-y-4">
+                {[
+                  { label: "Name", field: "name" as const, value: profile.name, type: "text" },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.field}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + i * 0.08 }}
+                  >
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{item.label}</label>
+                    <input
+                      type={item.type}
+                      value={item.value}
+                      onChange={(e) => updateField(item.field, e.target.value)}
+                      className="w-full mt-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                    />
+                  </motion.div>
+                ))}
+
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.38 }}
+                  className="grid grid-cols-2 gap-3"
+                >
+                  <div>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Email</label>
+                    <input
+                      type="email"
+                      value={profile.email || ""}
+                      onChange={(e) => updateField("email", e.target.value)}
+                      placeholder="your@email.com"
+                      className="w-full mt-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Phone</label>
+                    <input
+                      type="tel"
+                      value={profile.phone || ""}
+                      onChange={(e) => updateField("phone", e.target.value)}
+                      placeholder="+1 (555) 000-0000"
+                      className="w-full mt-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/50"
+                    />
+                  </div>
+                </motion.div>
+
+                {[
+                  { label: "Experience", field: "experience" as const, value: profile.experience },
+                  { label: "Education", field: "education" as const, value: profile.education },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.field}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.46 + i * 0.08 }}
+                  >
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{item.label}</label>
+                    <input
+                      type="text"
+                      value={item.value}
+                      onChange={(e) => updateField(item.field, e.target.value)}
+                      className="w-full mt-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                    />
+                  </motion.div>
+                ))}
+
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.62 }}
+                >
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Summary</label>
+                  <textarea
+                    value={profile.summary}
+                    onChange={(e) => updateField("summary", e.target.value)}
+                    rows={3}
+                    className="w-full mt-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all"
                   />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Phone</label>
-                  <input
-                    type="tel"
-                    value={profile.phone || ""}
-                    onChange={(e) => updateField("phone", e.target.value)}
-                    placeholder="+1 (555) 000-0000"
-                    className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-                  />
-                </div>
+                </motion.div>
+
+                {/* Skills */}
+                <motion.div
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Skills</label>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {profile.skills.map((skill, si) => (
+                      <motion.span
+                        key={skill}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.75 + si * 0.03 }}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-foreground px-3 py-1.5 rounded-full text-xs font-medium"
+                      >
+                        {skill}
+                        <button onClick={() => removeSkill(skill)} className="opacity-50 hover:opacity-100 transition-opacity">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </motion.span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <input
+                      type="text"
+                      placeholder="Add a skill..."
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && addSkill()}
+                      className="flex-1 px-4 py-3 rounded-xl border-none bg-primary/5 text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                    />
+                    <Button variant="outline" size="sm" onClick={addSkill} className="rounded-xl">
+                      <Plus className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </motion.div>
               </div>
 
-              <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Experience</label>
-                <input
-                  type="text"
-                  value={profile.experience}
-                  onChange={(e) => updateField("experience", e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Education</label>
-                <input
-                  type="text"
-                  value={profile.education}
-                  onChange={(e) => updateField("education", e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Summary</label>
-                <textarea
-                  value={profile.summary}
-                  onChange={(e) => updateField("summary", e.target.value)}
-                  rows={3}
-                  className="w-full mt-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                />
-              </div>
-
-              {/* Skills */}
-              <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Skills</label>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {profile.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-2.5 py-1 rounded-lg text-xs font-medium"
-                    >
-                      {skill}
-                      <button onClick={() => removeSkill(skill)} className="opacity-50 hover:opacity-100 transition-opacity">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    placeholder="Add a skill..."
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addSkill()}
-                    className="flex-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <Button variant="outline" size="sm" onClick={addSkill}>
-                    <Plus className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      <div className="flex gap-3 mt-6">
-        <Button variant="outline" className="flex-1" onClick={() => navigate("/onboarding/role")}>
-          Back
-        </Button>
-        <Button
-          variant="hero"
-          className="flex-1"
-          disabled={!profile}
-          onClick={handleNext}
-        >
-          Explore Paths
-          <ArrowRight className="w-4 h-4" />
-        </Button>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+                className="flex gap-3 mt-8"
+              >
+                <Button variant="outline" className="flex-1 rounded-2xl py-6" onClick={() => navigate("/onboarding/role")}>
+                  Back
+                </Button>
+                <Button
+                  variant="hero"
+                  className="flex-1 rounded-2xl py-6"
+                  disabled={!profile}
+                  onClick={handleNext}
+                >
+                  Explore Paths
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </motion.div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     </OnboardingShell>
   );
