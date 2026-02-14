@@ -22,6 +22,7 @@ export type Database = {
           last_alerted_at: string | null
           phone_or_identifier: string | null
           positions: string[]
+          preferred_country: string | null
           role_title: string | null
           skills: string[]
           updated_at: string
@@ -34,6 +35,7 @@ export type Database = {
           last_alerted_at?: string | null
           phone_or_identifier?: string | null
           positions?: string[]
+          preferred_country?: string | null
           role_title?: string | null
           skills?: string[]
           updated_at?: string
@@ -46,6 +48,7 @@ export type Database = {
           last_alerted_at?: string | null
           phone_or_identifier?: string | null
           positions?: string[]
+          preferred_country?: string | null
           role_title?: string | null
           skills?: string[]
           updated_at?: string
