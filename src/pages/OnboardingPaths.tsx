@@ -245,7 +245,7 @@ const OnboardingPaths = () => {
                 } catch (e) {
                   console.error("Failed to save profile:", e);
                 }
-                navigate("/dashboard");
+                navigate("/auth");
               }}
             >
               Start Getting Jobs

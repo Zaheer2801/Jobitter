@@ -11,6 +11,7 @@ import OnboardingName from "./pages/OnboardingName";
 import OnboardingRole from "./pages/OnboardingRole";
 import OnboardingResume from "./pages/OnboardingResume";
 import OnboardingPaths from "./pages/OnboardingPaths";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const AnimatedRoutes = () => {
         <Route path="/onboarding/role" element={<PageTransition><OnboardingRole /></PageTransition>} />
         <Route path="/onboarding/resume" element={<PageTransition><OnboardingResume /></PageTransition>} />
         <Route path="/onboarding/paths" element={<PageTransition><OnboardingPaths /></PageTransition>} />
+        <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
