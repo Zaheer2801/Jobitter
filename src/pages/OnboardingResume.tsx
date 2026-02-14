@@ -55,7 +55,7 @@ const OnboardingResume = () => {
       const parsed: ResumeProfile = result.data;
       setProfile(parsed);
       update({ resumeFile: f, resumeProfile: parsed });
-      toast.success("Resume parsed successfully!");
+      toast.success("Got your details!");
     } catch (err: any) {
       console.error("Parse error:", err);
       toast.error(err.message || "Failed to parse resume. Please try again.");
@@ -103,7 +103,7 @@ const OnboardingResume = () => {
       const enhanced: ResumeProfile = { ...profile, ...result.data };
       setProfile(enhanced);
       update({ resumeProfile: enhanced });
-      toast.success("Profile enhanced with AI!");
+      toast.success("Profile improved!");
     } catch (err: any) {
       console.error("Enhance error:", err);
       toast.error(err.message || "Enhancement failed. Please try again.");
@@ -249,7 +249,7 @@ const OnboardingResume = () => {
               </div>
 
               <SplitText
-                text="AI is reading your resume..."
+                text="Extracting your details..."
                 className="text-heading text-lg md:text-xl font-normal text-muted-foreground"
                 splitType="words"
                 staggerDelay={0.08}
@@ -287,7 +287,7 @@ const OnboardingResume = () => {
                   <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
                 </motion.div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-foreground font-medium">Resume parsed!</p>
+                  <p className="text-foreground font-medium">We got your details!</p>
                   <p className="text-muted-foreground text-xs flex items-center gap-1 truncate">
                     <FileText className="w-3 h-3 flex-shrink-0" />
                     {file?.name}
@@ -305,7 +305,7 @@ const OnboardingResume = () => {
                   ) : (
                     <Sparkles className="w-3.5 h-3.5" />
                   )}
-                  {enhancing ? "Enhancing..." : "AI Enhance"}
+                  {enhancing ? "Improving..." : "Improve"}
                 </Button>
               </motion.div>
 
