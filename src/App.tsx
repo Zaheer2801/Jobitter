@@ -7,7 +7,6 @@ import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import Index from "./pages/Index";
 import OnboardingRole from "./pages/OnboardingRole";
 import OnboardingResume from "./pages/OnboardingResume";
-import OnboardingSkills from "./pages/OnboardingSkills";
 import OnboardingPaths from "./pages/OnboardingPaths";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -25,7 +24,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/onboarding/role" element={<OnboardingRole />} />
             <Route path="/onboarding/resume" element={<OnboardingResume />} />
-            <Route path="/onboarding/skills" element={<OnboardingSkills />} />
             <Route path="/onboarding/paths" element={<OnboardingPaths />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="*" element={<NotFound />} />
