@@ -65,8 +65,8 @@ const OnboardingPaths = () => {
 
   return (
     <OnboardingShell step={3} totalSteps={3}>
-      <h2 className="text-heading text-2xl mb-2 text-center">Your Career Paths</h2>
-      <p className="text-muted-foreground text-center mb-6">Based on your skills and experience</p>
+      <h2 className="text-heading text-2xl mb-2 text-center">Positions You Can Apply For</h2>
+      <p className="text-muted-foreground text-center mb-6">Specific roles matching your skills and experience</p>
 
       {loading ? (
         <div className="flex flex-col items-center py-12">

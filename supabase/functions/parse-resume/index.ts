@@ -99,8 +99,8 @@ Fields to extract:
       systemPrompt = `You are a career coach and resume optimization expert. Given the user's profile data, enhance each field for better market positioning. Make the summary more compelling, suggest additional relevant skills based on their experience, and improve the experience description. Keep changes realistic and professional. Return the enhanced data using the tool provided.`;
       userPrompt = `Enhance this profile for better job market positioning. Current role context: ${currentRole || "not specified"}\n\nProfile:\n${JSON.stringify(profileData, null, 2)}`;
     } else if (action === "career-paths") {
-      systemPrompt = `You are a career advisor. Given the user's skills, experience, and current role, suggest 5 realistic career paths they could pursue. For each path, provide a match percentage (50-98) based on how well their current skills align. Return results using the tool provided.`;
-      userPrompt = `Based on this profile, suggest career paths:\nCurrent Role: ${currentRole}\nSkills: ${profileData?.skills?.join(", ")}\nExperience: ${profileData?.experience}\nEducation: ${profileData?.education}`;
+      systemPrompt = `You are a career advisor and job market expert. Given the user's skills, experience, and current role, suggest 5 specific positions/specializations they can apply for RIGHT NOW on job boards. These should be concrete, searchable job position titles — NOT generic career paths. For example: "SAP EWM Consultant", "SAP MM Functional Analyst", "Supply Chain Data Analyst" — real positions found on LinkedIn/Indeed. For each, provide a match percentage (50-98) based on skill alignment and a brief reason referencing their specific skills. Return results using the tool provided.`;
+      userPrompt = `Based on this profile, suggest 5 specific job positions they can apply for today:\nCurrent Role: ${currentRole}\nSkills: ${profileData?.skills?.join(", ")}\nExperience: ${profileData?.experience}\nEducation: ${profileData?.education}`;
     } else {
       return new Response(JSON.stringify({ error: "Invalid action" }), {
         status: 400,
