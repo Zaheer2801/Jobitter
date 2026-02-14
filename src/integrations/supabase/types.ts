@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      job_alert_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_alerted_at: string | null
+          phone_or_identifier: string | null
+          positions: string[]
+          role_title: string | null
+          skills: string[]
+          updated_at: string
+          zapier_webhook_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_alerted_at?: string | null
+          phone_or_identifier?: string | null
+          positions?: string[]
+          role_title?: string | null
+          skills?: string[]
+          updated_at?: string
+          zapier_webhook_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_alerted_at?: string | null
+          phone_or_identifier?: string | null
+          positions?: string[]
+          role_title?: string | null
+          skills?: string[]
+          updated_at?: string
+          zapier_webhook_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
