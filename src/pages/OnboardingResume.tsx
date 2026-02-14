@@ -19,19 +19,15 @@ const OnboardingResume = () => {
   const [newSkill, setNewSkill] = useState("");
   const [enhancing, setEnhancing] = useState(false);
 
-  const extractText = async (f: File): Promise<string> => {
-    // Read file as text - works for .txt, basic .docx extraction
-    // For production, you'd want a proper PDF/DOCX parser
-    return new Promise((resolve) => {
+  const fileToBase64 = (f: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result as string;
-        // Clean up binary artifacts from docx
-        const cleaned = text.replace(/[^\x20-\x7E\n\r\t]/g, " ").replace(/\s+/g, " ").trim();
-        resolve(cleaned || `Resume file: ${f.name}`);
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]); // strip data:...;base64, prefix
       };
-      reader.onerror = () => resolve(`Resume file: ${f.name}`);
-      reader.readAsText(f);
+      reader.onerror = reject;
+      reader.readAsDataURL(f);
     });
   };
 
@@ -39,14 +35,14 @@ const OnboardingResume = () => {
     setFile(f);
     setParsing(true);
     try {
-      const resumeText = await extractText(f);
+      const base64 = await fileToBase64(f);
       const resp = await fetch(PARSE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ action: "parse", resumeText }),
+        body: JSON.stringify({ action: "parse", fileBase64: base64, fileName: f.name }),
       });
 
       if (!resp.ok) {
