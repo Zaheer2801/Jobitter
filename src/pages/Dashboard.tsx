@@ -558,18 +558,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="card-dreamer p-5">
-            <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
-              <Briefcase className="w-4 h-4 text-primary" />
-              Searching For
-            </h4>
-            {data.careerPaths.slice(0, 5).map((p) => (
-              <div key={p.role} className="flex items-center justify-between mb-2">
-                <span className="text-foreground text-xs">{p.role}</span>
-                <span className="text-primary text-xs font-bold">{p.match}%</span>
-              </div>
-            ))}
-          </div>
 
           <div className="card-dreamer p-5">
             <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
@@ -587,10 +575,10 @@ const Dashboard = () => {
       {/* Persistent Premium Banner — bottom-left */}
       {!isPremium && (
         <motion.div
-          initial={{ x: -100, opacity: 0 }}
+          initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 2, type: "spring", stiffness: 200, damping: 20 }}
-          className="fixed bottom-4 left-4 z-50 w-72"
+          className="fixed bottom-4 right-4 z-50 w-72"
         >
           <div className="bg-card border border-primary/20 rounded-2xl shadow-2xl p-4 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 pointer-events-none" />
