@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   Bell, Search, Heart, ExternalLink, MapPin, DollarSign,
-  Briefcase, Filter, Star, TrendingUp, Settings,
+  Briefcase, Filter, Star, TrendingUp, Settings, Loader2, RefreshCw,
 } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { toast } from "sonner";
+
+const SCRAPE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-jobs`;
 
 interface Job {
   id: string;
@@ -17,40 +21,67 @@ interface Job {
   matchScore: number;
   matchedSkills: string[];
   postedAgo: string;
+  url: string;
   saved: boolean;
 }
 
-const mockJobs: Job[] = [
-  {
-    id: "1", title: "Data Engineer", company: "TechCorp", location: "San Francisco, CA",
-    workMode: "Remote", salaryRange: "$110k–$140k", matchScore: 92,
-    matchedSkills: ["SQL", "Python"], postedAgo: "2h ago", saved: false,
-  },
-  {
-    id: "2", title: "Senior Data Analyst", company: "FinanceAI", location: "New York, NY",
-    workMode: "Hybrid", salaryRange: "$95k–$125k", matchScore: 88,
-    matchedSkills: ["SQL", "Tableau", "Excel"], postedAgo: "5h ago", saved: true,
-  },
-  {
-    id: "3", title: "BI Analyst", company: "RetailMax", location: "Austin, TX",
-    workMode: "Remote", salaryRange: "$85k–$110k", matchScore: 85,
-    matchedSkills: ["Tableau", "SQL"], postedAgo: "1d ago", saved: false,
-  },
-  {
-    id: "4", title: "Business Analyst", company: "ConsultPro", location: "Chicago, IL",
-    workMode: "On-site", salaryRange: "$80k–$105k", matchScore: 78,
-    matchedSkills: ["Excel", "SQL"], postedAgo: "1d ago", saved: false,
-  },
-  {
-    id: "5", title: "Data Scientist", company: "HealthTech", location: "Boston, MA",
-    workMode: "Remote", salaryRange: "$120k–$155k", matchScore: 72,
-    matchedSkills: ["Python"], postedAgo: "2d ago", saved: false,
-  },
-];
-
 const Dashboard = () => {
-  const [jobs, setJobs] = useState(mockJobs);
+  const { data } = useOnboarding();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchJobs = async () => {
+    const positions = data.careerPaths.map((p) => p.role);
+    const skills = data.resumeProfile?.skills || [];
+
+    if (positions.length === 0) {
+      toast.error("No positions found. Complete onboarding first.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const resp = await fetch(SCRAPE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ positions, skills }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || "Failed to fetch jobs");
+      }
+
+      const result = await resp.json();
+      const fetchedJobs: Job[] = (result.jobs || []).map((j: any, i: number) => ({
+        ...j,
+        id: `job-${i}`,
+        saved: false,
+      }));
+      setJobs(fetchedJobs);
+
+      if (fetchedJobs.length === 0) {
+        toast.info("No jobs found. Try broadening your positions.");
+      } else {
+        toast.success(`Found ${fetchedJobs.length} real job listings!`);
+      }
+    } catch (err: any) {
+      console.error("Job fetch error:", err);
+      toast.error(err.message || "Failed to fetch jobs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (data.careerPaths.length > 0) {
+      fetchJobs();
+    }
+  }, []);
 
   const toggleSave = (id: string) =>
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, saved: !j.saved } : j)));
@@ -72,11 +103,13 @@ const Dashboard = () => {
             <div className="relative">
               <Bell className="w-5 h-5 text-muted-foreground" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-                3
+                {jobs.length}
               </span>
             </div>
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-primary text-sm font-bold">JD</span>
+              <span className="text-primary text-sm font-bold">
+                {data.resumeProfile?.name?.charAt(0)?.toUpperCase() || "U"}
+              </span>
             </div>
           </div>
         </div>
@@ -97,76 +130,94 @@ const Dashboard = () => {
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
               />
             </div>
-            <Button variant="outline" size="default">
-              <Filter className="w-4 h-4 mr-1" />
-              Filters
+            <Button variant="outline" size="default" onClick={fetchJobs} disabled={loading}>
+              <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />
+              Refresh
             </Button>
           </div>
 
-          {/* Job cards */}
-          <div className="space-y-3">
-            {filteredJobs.map((job, i) => (
-              <motion.div
-                key={job.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="card-dreamer p-5 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-heading text-base">{job.title}</h3>
-                      {job.matchScore >= 85 && (
-                        <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          🔥 HOT
-                        </span>
-                      )}
+          {/* Loading */}
+          {loading && jobs.length === 0 ? (
+            <div className="flex flex-col items-center py-16">
+              <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+              <p className="text-foreground font-medium">Scraping real jobs from the web...</p>
+              <p className="text-muted-foreground text-sm mt-1">Searching Indeed, LinkedIn, Glassdoor & more</p>
+            </div>
+          ) : filteredJobs.length === 0 && !loading ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground mb-4">No jobs found. Complete onboarding or refresh.</p>
+              <Button variant="hero" onClick={fetchJobs}>Search Jobs</Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredJobs.sort((a, b) => b.matchScore - a.matchScore).map((job, i) => (
+                <motion.div
+                  key={job.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="card-dreamer p-5 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-heading text-base">{job.title}</h3>
+                        {job.matchScore >= 85 && (
+                          <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            🔥 HOT
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground text-sm">{job.company}</p>
                     </div>
-                    <p className="text-muted-foreground text-sm">{job.company}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-lg font-bold ${
-                      job.matchScore >= 85 ? "text-primary" : job.matchScore >= 70 ? "text-success" : "text-muted-foreground"
-                    }`}>
-                      {job.matchScore}%
+                    <div className="text-right">
+                      <div className={`text-lg font-bold ${
+                        job.matchScore >= 85 ? "text-primary" : job.matchScore >= 70 ? "text-success" : "text-muted-foreground"
+                      }`}>
+                        {job.matchScore}%
+                      </div>
+                      <span className="text-xs text-muted-foreground">match</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">match</span>
                   </div>
-                </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
-                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{job.location}</span>
-                  <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" />{job.workMode}</span>
-                  <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" />{job.salaryRange}</span>
-                  <span className="text-xs">{job.postedAgo}</span>
-                </div>
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{job.location}</span>
+                    <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" />{job.workMode}</span>
+                    <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" />{job.salaryRange}</span>
+                    <span className="text-xs">{job.postedAgo}</span>
+                  </div>
 
-                <div className="flex items-center gap-1.5 mb-4">
-                  <span className="text-xs text-muted-foreground">Matches:</span>
-                  {job.matchedSkills.map((s) => (
-                    <span key={s} className="bg-accent text-accent-foreground px-2 py-0.5 rounded-md text-xs font-medium">
-                      ✅ {s}
-                    </span>
-                  ))}
-                </div>
+                  <div className="flex items-center gap-1.5 mb-4">
+                    <span className="text-xs text-muted-foreground">Matches:</span>
+                    {job.matchedSkills.map((s) => (
+                      <span key={s} className="bg-accent text-accent-foreground px-2 py-0.5 rounded-md text-xs font-medium">
+                        ✅ {s}
+                      </span>
+                    ))}
+                  </div>
 
-                <div className="flex gap-2">
-                  <Button variant="hero" size="sm" className="flex-1">
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    1-Click Apply
-                  </Button>
-                  <Button
-                    variant={job.saved ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleSave(job.id)}
-                  >
-                    <Heart className={`w-3.5 h-3.5 ${job.saved ? "fill-current" : ""}`} />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => window.open(job.url, "_blank")}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Apply Now
+                    </Button>
+                    <Button
+                      variant={job.saved ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleSave(job.id)}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${job.saved ? "fill-current" : ""}`} />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right panel */}
@@ -174,22 +225,28 @@ const Dashboard = () => {
           <div className="card-dreamer p-5">
             <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
               <TrendingUp className="w-4 h-4 text-primary" />
-              Skills Match
+              Your Skills
             </h4>
-            {["SQL", "Python", "Tableau", "Excel", "Data Modeling"].map((skill) => {
-              const pct = Math.floor(Math.random() * 30 + 70);
-              return (
-                <div key={skill} className="mb-2">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-foreground font-medium">{skill}</span>
-                    <span className="text-muted-foreground">{pct}%</span>
-                  </div>
-                  <div className="h-1.5 bg-secondary rounded-full">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
+            {(data.resumeProfile?.skills || []).slice(0, 8).map((skill) => (
+              <div key={skill} className="mb-2">
+                <span className="text-foreground text-xs font-medium bg-accent px-2 py-1 rounded-md inline-block">
+                  {skill}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="card-dreamer p-5">
+            <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
+              <Briefcase className="w-4 h-4 text-primary" />
+              Searching For
+            </h4>
+            {data.careerPaths.slice(0, 5).map((p) => (
+              <div key={p.role} className="flex items-center justify-between mb-2">
+                <span className="text-foreground text-xs">{p.role}</span>
+                <span className="text-primary text-xs font-bold">{p.match}%</span>
+              </div>
+            ))}
           </div>
 
           <div className="card-dreamer p-5">
@@ -209,31 +266,6 @@ const Dashboard = () => {
             <Button variant="hero" size="sm" className="w-full">
               $19/month
             </Button>
-          </div>
-
-          <div className="card-dreamer p-5">
-            <h4 className="text-heading text-sm flex items-center gap-2 mb-3">
-              <Settings className="w-4 h-4 text-muted-foreground" />
-              Notifications
-            </h4>
-            <div className="space-y-2 text-sm">
-              {[
-                { label: "In-app", on: true },
-                { label: "Email", on: true },
-                { label: "WhatsApp", on: false },
-              ].map((n) => (
-                <div key={n.label} className="flex items-center justify-between">
-                  <span className="text-foreground">{n.label}</span>
-                  <div className={`w-8 h-4.5 rounded-full relative cursor-pointer transition-colors ${
-                    n.on ? "bg-primary" : "bg-secondary"
-                  }`}>
-                    <div className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-card shadow transition-transform ${
-                      n.on ? "left-[calc(100%-16px)]" : "left-0.5"
-                    }`} />
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

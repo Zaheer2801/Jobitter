@@ -2,3 +2,6 @@ project_id = "qydfqzhghhedrheykloa"
 
 [functions.parse-resume]
 verify_jwt = false
+
+[functions.scrape-jobs]
+verify_jwt = false
