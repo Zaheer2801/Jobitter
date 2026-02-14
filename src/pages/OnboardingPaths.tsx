@@ -6,6 +6,7 @@ import OnboardingShell from "@/components/OnboardingShell";
 import { motion } from "framer-motion";
 import { Rocket, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-resume`;
 
@@ -175,7 +176,19 @@ const OnboardingPaths = () => {
           variant="hero"
           className="flex-1"
           disabled={paths.length === 0}
-          onClick={() => navigate("/dashboard")}
+          onClick={async () => {
+            // Save profile to DB for cron job alerts
+            try {
+              await supabase.from("job_alert_profiles").insert({
+                positions: paths.map((p) => p.role),
+                skills: data.resumeProfile?.skills || [],
+                role_title: data.currentRole,
+              });
+            } catch (e) {
+              console.error("Failed to save profile:", e);
+            }
+            navigate("/dashboard");
+          }}
         >
           Start Getting Jobs
           <ArrowRight className="w-4 h-4" />
