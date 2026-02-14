@@ -55,10 +55,10 @@ const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
         {showBell ? (
           <motion.span
             key="bell"
-            initial={{ rotateY: 90, opacity: 0 }}
-            animate={{ rotateY: 0, opacity: 1 }}
-            exit={{ rotateY: -90, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeInOut" as const }}
+            initial={{ rotateY: 90, opacity: 0, scale: 0.6 }}
+            animate={{ rotateY: 0, opacity: 1, scale: [1.25, 0.95, 1.05, 1] }}
+            exit={{ rotateY: -90, opacity: 0, scale: 0.6 }}
+            transition={{ duration: 0.5, ease: "easeOut" as const }}
             className="inline-flex items-baseline"
             style={{ transformOrigin: "center center", backfaceVisibility: "hidden", display: "inline-flex" }}
           >
