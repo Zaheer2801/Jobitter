@@ -8,17 +8,17 @@ const steps = [
   {
     num: 1,
     title: "Shape your professional story",
-    desc: "Draft a Career Identity Statement that showcases the unique skills and experiences you bring to the workforce.",
+    desc: "Upload your resume and share your current role to showcase your unique skills and experiences.",
   },
   {
     num: 2,
     title: "Explore career possibilities",
-    desc: "Discover careers that might align with your background and delve deeper into those that interest you.",
+    desc: "Discover careers that align with your background and delve deeper into those that interest you.",
   },
   {
     num: 3,
-    title: "Take the next step",
-    desc: "Get matched with jobs and take the first steps toward your career goals.",
+    title: "Get matched with jobs",
+    desc: "Receive smart notifications when high-match jobs appear, tailored to your skills.",
   },
 ];
 
@@ -35,15 +35,24 @@ const Index = () => {
       {/* Nav Pills */}
       <div className="w-full px-4 py-3 flex justify-center">
         <div className="flex gap-3 max-w-3xl w-full">
-          <button className="nav-pill flex-1 justify-center">
+          <button
+            className="nav-pill flex-1 justify-center"
+            onClick={() => navigate("/onboarding/role")}
+          >
             <Sparkles className="w-4 h-4" />
             Career Identity
           </button>
-          <button className="nav-pill flex-1 justify-center">
+          <button
+            className="nav-pill flex-1 justify-center"
+            onClick={() => navigate("/onboarding/paths")}
+          >
             <Compass className="w-4 h-4" />
             Explore Paths
           </button>
-          <button className="nav-pill flex-1 justify-center">
+          <button
+            className="nav-pill flex-1 justify-center"
+            onClick={() => navigate("/dashboard")}
+          >
             <Zap className="w-4 h-4" />
             Get Matched
           </button>
