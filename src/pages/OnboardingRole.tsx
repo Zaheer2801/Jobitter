@@ -137,7 +137,7 @@ const OnboardingRole = () => {
 
             <SplitText
               text="Where are you looking for jobs?"
-              className="text-heading text-xl md:text-2xl lg:text-3xl leading-snug mb-2"
+              className="text-heading text-lg md:text-xl leading-relaxed mb-2 font-normal text-muted-foreground"
               delay={0.2}
               splitType="words"
               staggerDelay={0.06}
