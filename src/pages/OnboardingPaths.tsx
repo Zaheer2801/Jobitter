@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useOnboarding, CareerPath } from "@/contexts/OnboardingContext";
 import SplitText from "@/components/SplitText";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,10 +29,25 @@ const generatePositions = (count: number) => {
   return positions;
 };
 
+const getRoleDescription = (role: string): string[] => {
+  const lower = role.toLowerCase();
+  if (lower.includes("analyst")) return ["Analyze data trends & patterns", "Create reports & dashboards", "Drive data-informed decisions"];
+  if (lower.includes("engineer")) return ["Design & build systems", "Write clean, scalable code", "Collaborate with cross-functional teams"];
+  if (lower.includes("manager")) return ["Lead & mentor team members", "Set goals & track progress", "Coordinate cross-team projects"];
+  if (lower.includes("designer")) return ["Create intuitive user experiences", "Build design systems & prototypes", "Conduct user research"];
+  if (lower.includes("developer")) return ["Build & maintain applications", "Debug & optimize performance", "Implement new features"];
+  if (lower.includes("scientist")) return ["Build predictive models", "Analyze complex datasets", "Present actionable insights"];
+  if (lower.includes("intern")) return ["Learn industry best practices", "Support team projects", "Gain hands-on experience"];
+  if (lower.includes("lead")) return ["Guide technical direction", "Mentor junior members", "Deliver high-impact projects"];
+  if (lower.includes("consultant")) return ["Advise on best practices", "Solve complex problems", "Deliver client solutions"];
+  return ["Drive key initiatives", "Collaborate with teams", "Deliver impactful results"];
+};
+
 const OnboardingPaths = () => {
   const navigate = useNavigate();
   const { data, update } = useOnboarding();
   const [loading, setLoading] = useState(false);
+  const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [paths, setPaths] = useState<CareerPath[]>(data.careerPaths);
 
   useEffect(() => {
@@ -185,14 +200,42 @@ const OnboardingPaths = () => {
                     x: { delay: 0.5 + i * 0.12, duration: 12 + i * 2, repeat: Infinity, ease: "easeInOut" },
                     y: { delay: 0.5 + i * 0.12, duration: 10 + i * 1.5, repeat: Infinity, ease: "easeInOut" },
                   }}
-                  whileHover={{ scale: 1.15, zIndex: 10 }}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-default"
-                  style={{ zIndex: isHighMatch ? 5 : 2 }}
+                  whileHover={{ scale: 1.15, zIndex: 50 }}
+                  onHoverStart={() => setHoveredPath(path.role)}
+                  onHoverEnd={() => setHoveredPath(null)}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  style={{ zIndex: hoveredPath === path.role ? 50 : isHighMatch ? 5 : 2 }}
                 >
                   <div className="flex items-center gap-2 whitespace-nowrap">
                     <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${getDotColor(path.match)}`} />
                     <span className="text-foreground text-sm font-medium">{path.role}</span>
                   </div>
+
+                  {/* Hover tooltip */}
+                  <AnimatePresence>
+                    {hoveredPath === path.role && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border border-border rounded-2xl shadow-xl p-4 min-w-[200px] max-w-[240px] z-50"
+                      >
+                        <p className="text-xs font-semibold text-foreground mb-2">Key Responsibilities</p>
+                        <ul className="space-y-1.5">
+                          {getRoleDescription(path.role).map((desc, di) => (
+                            <li key={di} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                              <span className="text-primary mt-0.5">•</span>
+                              {desc}
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-2 pt-2 border-t border-border">
+                          <span className="text-[10px] text-muted-foreground/60">{path.match}% match</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })}
@@ -220,7 +263,7 @@ const OnboardingPaths = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="flex gap-3 mt-4 max-w-sm mx-auto w-full px-6 pb-8"
+            className="flex gap-3 mt-auto max-w-sm mx-auto w-full px-6 py-6"
           >
             <Button
               variant="outline"
