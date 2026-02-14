@@ -101,6 +101,7 @@ const Dashboard = () => {
   const fetchJobs = async () => {
     const positions = data.careerPaths.map((p) => p.role);
     const skills = data.resumeProfile?.skills || [];
+    const country = data.preferredCountry || "";
 
     if (positions.length === 0) {
       toast.error("No positions found. Complete onboarding first.");
@@ -115,7 +116,7 @@ const Dashboard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ positions, skills }),
+        body: JSON.stringify({ positions, skills, country }),
       });
 
       if (!resp.ok) {

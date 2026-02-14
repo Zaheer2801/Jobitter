@@ -1,0 +1,1 @@
+ALTER TABLE public.job_alert_profiles ADD COLUMN preferred_country text DEFAULT NULL;

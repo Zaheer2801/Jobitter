@@ -183,6 +183,7 @@ const OnboardingPaths = () => {
                 positions: paths.map((p) => p.role),
                 skills: data.resumeProfile?.skills || [],
                 role_title: data.currentRole,
+                preferred_country: data.preferredCountry || null,
               });
             } catch (e) {
               console.error("Failed to save profile:", e);

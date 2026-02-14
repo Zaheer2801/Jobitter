@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { positions, skills } = await req.json();
+    const { positions, skills, country } = await req.json();
 
     if (!positions || !Array.isArray(positions) || positions.length === 0) {
       return new Response(
@@ -38,7 +38,8 @@ serve(async (req) => {
     }
 
     // Search for jobs using top 3 positions
-    const searchQueries = positions.slice(0, 3).map((p: string) => `${p} jobs hiring now`);
+    const countryFilter = country ? ` in ${country}` : "";
+    const searchQueries = positions.slice(0, 3).map((p: string) => `${p} jobs hiring now${countryFilter}`);
     
     const searchResults = await Promise.all(
       searchQueries.map(async (query: string) => {
@@ -97,7 +98,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a job listing parser. Extract real job listings from search results. For each ACTUAL job posting found, extract: title, company, location, workMode (Remote/Hybrid/On-site), salaryRange (if mentioned, else "Not disclosed"), url (the actual job posting URL), and postedAgo (if mentioned, else "Recent"). Only include real job postings, not articles or blog posts. User's skills: ${(skills || []).join(", ")}. For each job, calculate a matchScore (50-98) based on how well the user's skills match the job requirements.`,
+            content: `You are a job listing parser. Extract real job listings from search results. For each ACTUAL job posting found, extract: title, company, location, workMode (Remote/Hybrid/On-site), salaryRange (if mentioned, else "Not disclosed"), url (the actual job posting URL), and postedAgo (if mentioned, else "Recent"). Only include real job postings, not articles or blog posts.${country ? ` IMPORTANT: Only include jobs located in ${country}. Exclude any jobs from other countries.` : ""} User's skills: ${(skills || []).join(", ")}. For each job, calculate a matchScore (50-98) based on how well the user's skills match the job requirements.`,
           },
           {
             role: "user",
