@@ -9,24 +9,10 @@ interface JobitterLogoProps {
 }
 
 const sizeMap = {
-  sm: { text: "text-lg", bell: 14, gap: "gap-0" },
-  md: { text: "text-2xl", bell: 20, gap: "gap-0" },
-  lg: { text: "text-5xl md:text-6xl", bell: 40, gap: "gap-0.5" },
-  xl: { text: "text-6xl md:text-7xl", bell: 48, gap: "gap-0.5" },
-};
-
-const bellRing = {
-  animate: {
-    rotate: [0, 12, -12, 8, -8, 4, -4, 0],
-    transition: { duration: 0.6, ease: "easeInOut" as const, delay: 0.35 },
-  },
-};
-
-const flipIn = {
-  initial: { rotateY: 90, opacity: 0 },
-  animate: { rotateY: 0, opacity: 1 },
-  exit: { rotateY: -90, opacity: 0 },
-  transition: { duration: 0.4, ease: "easeInOut" as const },
+  sm: { text: "text-lg", bell: 14 },
+  md: { text: "text-2xl", bell: 20 },
+  lg: { text: "text-5xl md:text-6xl", bell: 40 },
+  xl: { text: "text-6xl md:text-7xl", bell: 48 },
 };
 
 const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
@@ -42,43 +28,48 @@ const JobitterLogo = ({ size = "md", className = "" }: JobitterLogoProps) => {
   return (
     <span
       onClick={() => navigate("/")}
-      className={`inline-flex items-baseline ${s.gap} font-light tracking-tight text-foreground cursor-pointer select-none ${className}`}
+      className={`inline-flex items-baseline font-light tracking-tight text-foreground cursor-pointer select-none ${s.text} ${className}`}
       style={{ perspective: "400px" }}
     >
-      <span className={s.text}>JOBITT</span>
-      <span
-        className="relative inline-flex items-baseline"
-        style={{ width: `${s.bell * 0.75}px`, height: "1em" }}
-      >
-        <AnimatePresence mode="wait">
-          {showBell ? (
+      JOBITT
+      <AnimatePresence mode="wait">
+        {showBell ? (
+          <motion.span
+            key="bell"
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" as const }}
+            className="inline-flex items-baseline"
+            style={{ transformOrigin: "center center", backfaceVisibility: "hidden", display: "inline-flex" }}
+          >
             <motion.span
-              key="bell"
-              {...flipIn}
-              className="absolute inset-0 flex items-end justify-center"
-              style={{ transformOrigin: "center center", backfaceVisibility: "hidden" }}
+              animate={{ rotate: [0, 12, -12, 8, -8, 4, -4, 0] }}
+              transition={{ duration: 0.6, ease: "easeInOut" as const, delay: 0.35 }}
+              className="inline-flex items-baseline"
             >
-              <motion.span {...bellRing} className="inline-flex" style={{ marginBottom: "-0.05em" }}>
-                <Bell
-                  size={s.bell}
-                  className="text-foreground fill-foreground"
-                  strokeWidth={1.5}
-                />
-              </motion.span>
+              <Bell
+                size={s.bell}
+                className="text-foreground fill-foreground"
+                strokeWidth={1.5}
+                style={{ verticalAlign: "baseline", marginBottom: "-0.1em" }}
+              />
             </motion.span>
-          ) : (
-            <motion.span
-              key="letter"
-              {...flipIn}
-              className={`absolute inset-0 flex items-end justify-center ${s.text} font-light leading-none`}
-              style={{ transformOrigin: "center center", backfaceVisibility: "hidden" }}
-            >
-              E
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </span>
-      <span className={s.text}>R</span>
+          </motion.span>
+        ) : (
+          <motion.span
+            key="letter"
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" as const }}
+            style={{ transformOrigin: "center center", backfaceVisibility: "hidden" }}
+          >
+            E
+          </motion.span>
+        )}
+      </AnimatePresence>
+      R
     </span>
   );
 };
