@@ -126,7 +126,7 @@ const OnboardingPaths = () => {
           </div>
           <SplitText
             text="AI is finding your career paths..."
-            className="text-heading text-xl md:text-2xl"
+            className="text-heading text-lg md:text-xl font-normal text-muted-foreground"
             splitType="words"
             staggerDelay={0.08}
             tag="h3"

@@ -159,7 +159,7 @@ const OnboardingResume = () => {
 
               <SplitText
                 text="Now, let's see your resume:"
-                className="text-heading text-xl md:text-2xl lg:text-3xl leading-snug mb-2"
+                className="text-heading text-lg md:text-xl leading-relaxed mb-2 font-normal text-muted-foreground"
                 delay={0.3}
                 splitType="words"
                 staggerDelay={0.07}
@@ -250,7 +250,7 @@ const OnboardingResume = () => {
 
               <SplitText
                 text="AI is reading your resume..."
-                className="text-heading text-xl md:text-2xl mb-3"
+                className="text-heading text-lg md:text-xl font-normal text-muted-foreground"
                 splitType="words"
                 staggerDelay={0.08}
                 tag="h3"
