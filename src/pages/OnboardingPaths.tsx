@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useOnboarding } from "@/contexts/OnboardingContext";
+import OnboardingShell from "@/components/OnboardingShell";
 import { motion } from "framer-motion";
-import { Rocket } from "lucide-react";
+import { Rocket, ArrowLeft, ArrowRight } from "lucide-react";
 
 const OnboardingPaths = () => {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ const OnboardingPaths = () => {
         { role: "Reporting Specialist", match: 68 },
       ];
 
-  // Position items in concentric rings
   const positions = [
     { x: 0, y: -90, ring: 1 },
     { x: 85, y: -28, ring: 1 },
@@ -27,19 +27,12 @@ const OnboardingPaths = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
-      >
-        <h2 className="text-heading text-3xl mb-2">Your Career Paths</h2>
-        <p className="text-muted-foreground">Based on your skills and experience</p>
-      </motion.div>
+    <OnboardingShell step={4} totalSteps={4}>
+      <h2 className="text-heading text-2xl mb-2 text-center">Your Career Paths</h2>
+      <p className="text-muted-foreground text-center mb-6">Based on your skills and experience</p>
 
-      {/* Radar-style visualization */}
-      <div className="relative w-80 h-80 md:w-96 md:h-96 mb-12">
-        {/* Rings */}
+      {/* Radar visualization */}
+      <div className="relative w-72 h-72 mx-auto mb-8">
         {[1, 2, 3].map((ring) => (
           <div
             key={ring}
@@ -53,17 +46,14 @@ const OnboardingPaths = () => {
           />
         ))}
 
-        {/* Center label */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Rocket className="w-7 h-7 text-primary" />
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Rocket className="w-6 h-6 text-primary" />
           </div>
         </div>
 
-        {/* Path nodes */}
         {paths.map((path, i) => {
           const pos = positions[i];
-          const scale = path.match / 100;
           return (
             <motion.div
               key={path.role}
@@ -72,13 +62,13 @@ const OnboardingPaths = () => {
               transition={{ delay: 0.3 + i * 0.15, type: "spring", stiffness: 200 }}
               className="absolute flex flex-col items-center"
               style={{
-                left: `calc(50% + ${pos.x * 1.5}px)`,
-                top: `calc(50% + ${pos.y * 1.5}px)`,
+                left: `calc(50% + ${pos.x * 1.3}px)`,
+                top: `calc(50% + ${pos.y * 1.3}px)`,
                 transform: "translate(-50%, -50%)",
               }}
             >
               <div
-                className={`rounded-2xl px-4 py-2.5 shadow-md border text-center transition-all hover:scale-105 cursor-default ${
+                className={`rounded-2xl px-3 py-2 shadow-md border text-center transition-all hover:scale-105 cursor-default ${
                   path.match >= 85
                     ? "bg-primary text-primary-foreground border-primary glow-primary"
                     : path.match >= 70
@@ -86,11 +76,11 @@ const OnboardingPaths = () => {
                     : "bg-card text-foreground border-border"
                 }`}
               >
-                <p className="text-sm font-semibold whitespace-nowrap">{path.role}</p>
-                <p className={`text-xs font-bold mt-0.5 ${
+                <p className="text-xs font-semibold whitespace-nowrap">{path.role}</p>
+                <p className={`text-[10px] font-bold mt-0.5 ${
                   path.match >= 85 ? "text-primary-foreground/80" : "text-primary"
                 }`}>
-                  {path.match}% match
+                  {path.match}%
                 </p>
               </div>
             </motion.div>
@@ -98,22 +88,22 @@ const OnboardingPaths = () => {
         })}
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
+      {/* Navigation buttons */}
+      <div className="flex gap-3">
+        <Button variant="outline" className="flex-1" onClick={() => navigate("/onboarding/skills")}>
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
         <Button
           variant="hero"
-          size="xl"
+          className="flex-1"
           onClick={() => navigate("/dashboard")}
-          className="group"
         >
           Start Getting Jobs
-          <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-4 h-4" />
         </Button>
-      </motion.div>
-    </div>
+      </div>
+    </OnboardingShell>
   );
 };
 
