@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Sparkles, Compass, Zap, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
 
 const steps = [
@@ -31,33 +31,6 @@ const Index = () => {
       <header className="w-full flex items-center justify-center py-4 border-b border-border bg-card/60 backdrop-blur-sm">
         <JobitterLogo size="sm" />
       </header>
-
-      {/* Nav Pills */}
-      <div className="w-full px-4 py-3 flex justify-center">
-        <div className="flex gap-3 max-w-3xl w-full">
-          <button
-            className="nav-pill flex-1 justify-center"
-            onClick={() => navigate("/onboarding/name")}
-          >
-            <Sparkles className="w-4 h-4" />
-            Career Identity
-          </button>
-          <button
-            className="nav-pill flex-1 justify-center"
-            onClick={() => navigate("/onboarding/paths")}
-          >
-            <Compass className="w-4 h-4" />
-            Explore Paths
-          </button>
-          <button
-            className="nav-pill flex-1 justify-center"
-            onClick={() => navigate("/dashboard")}
-          >
-            <Zap className="w-4 h-4" />
-            Get Matched
-          </button>
-        </div>
-      </div>
 
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-12 relative overflow-hidden">
