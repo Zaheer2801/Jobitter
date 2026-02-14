@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import JobitterLogo from "@/components/JobitterLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const steps = [
   {
@@ -27,6 +28,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-12 relative overflow-hidden">
         <motion.div
