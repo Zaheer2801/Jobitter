@@ -38,7 +38,7 @@ const Index = () => {
         <div className="flex gap-3 max-w-3xl w-full">
           <button
             className="nav-pill flex-1 justify-center"
-            onClick={() => navigate("/onboarding/role")}
+            onClick={() => navigate("/onboarding/name")}
           >
             <Sparkles className="w-4 h-4" />
             Career Identity
@@ -90,7 +90,7 @@ const Index = () => {
           </p>
 
           <Button
-            onClick={() => navigate("/onboarding/role")}
+            onClick={() => navigate("/onboarding/name")}
             className="h-14 px-16 rounded-xl text-base font-medium shadow-md hover:shadow-lg transition-all"
           >
             Start
