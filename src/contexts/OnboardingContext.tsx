@@ -18,6 +18,7 @@ export interface CareerPath {
 }
 
 export interface OnboardingData {
+  candidateName: string;
   currentRole: string;
   preferredCountry: string;
   resumeFile: File | null;
@@ -26,6 +27,7 @@ export interface OnboardingData {
 }
 
 const defaultData: OnboardingData = {
+  candidateName: "",
   currentRole: "",
   preferredCountry: "",
   resumeFile: null,

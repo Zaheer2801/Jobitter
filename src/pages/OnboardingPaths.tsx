@@ -11,18 +11,19 @@ import JobitterLogo from "@/components/JobitterLogo";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-resume`;
 
-// Generate scattered positions for bubbles around a center point
+// Generate well-spaced positions for bubbles using golden angle distribution
 const generatePositions = (count: number) => {
   const positions: { x: number; y: number; scale: number }[] = [];
-  const angleStep = (2 * Math.PI) / count;
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~137.5°
 
   for (let i = 0; i < count; i++) {
-    const angle = angleStep * i + (Math.random() - 0.5) * 0.8;
-    const radius = 160 + Math.random() * 140;
+    const angle = goldenAngle * i;
+    const radius = 180 + (i % 3) * 80 + (i * 20);
+    const clampedRadius = Math.min(radius, 340);
     positions.push({
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius,
-      scale: 0.8 + Math.random() * 0.4,
+      x: Math.cos(angle) * clampedRadius,
+      y: Math.sin(angle) * (clampedRadius * 0.6), // squish vertically to avoid overflow
+      scale: 1,
     });
   }
   return positions;
@@ -214,72 +215,43 @@ const OnboardingPaths = () => {
             </motion.div>
           </div>
 
-          {/* Path details list */}
-          <div className="max-w-2xl mx-auto w-full px-6 pb-8">
-            <div className="space-y-1">
-              {paths
-                .sort((a, b) => b.match - a.match)
-                .map((path, i) => (
-                  <motion.div
-                    key={path.role}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 + i * 0.08, type: "spring", stiffness: 200 }}
-                    className="flex items-start gap-4 py-3.5 border-b border-border/40 last:border-0 group hover:bg-accent/30 px-3 rounded-xl transition-colors"
-                  >
-                    <span className={`text-lg font-bold min-w-[48px] tabular-nums ${
-                      path.match >= 90 ? "text-primary" : path.match >= 80 ? "text-primary/70" : "text-muted-foreground"
-                    }`}>
-                      {path.match}%
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{path.role}</p>
-                      {path.reason && (
-                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{path.reason}</p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-
-            {/* Navigation */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              className="flex gap-3 mt-8"
+          {/* Navigation */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="flex gap-3 mt-4 max-w-sm mx-auto w-full px-6 pb-8"
+          >
+            <Button
+              variant="outline"
+              className="flex-1 rounded-2xl py-7 text-base"
+              onClick={() => navigate("/onboarding/resume")}
             >
-              <Button
-                variant="outline"
-                className="flex-1 rounded-2xl py-7 text-base"
-                onClick={() => navigate("/onboarding/resume")}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-              <Button
-                variant="hero"
-                className="flex-1 rounded-2xl py-7 text-base"
-                disabled={paths.length === 0}
-                onClick={async () => {
-                  try {
-                    await supabase.from("job_alert_profiles").insert({
-                      positions: paths.map((p) => p.role),
-                      skills: data.resumeProfile?.skills || [],
-                      role_title: data.currentRole,
-                      preferred_country: data.preferredCountry || null,
-                    });
-                  } catch (e) {
-                    console.error("Failed to save profile:", e);
-                  }
-                  navigate("/dashboard");
-                }}
-              >
-                Start Getting Jobs
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </motion.div>
-          </div>
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <Button
+              variant="hero"
+              className="flex-1 rounded-2xl py-7 text-base"
+              disabled={paths.length === 0}
+              onClick={async () => {
+                try {
+                  await supabase.from("job_alert_profiles").insert({
+                    positions: paths.map((p) => p.role),
+                    skills: data.resumeProfile?.skills || [],
+                    role_title: data.currentRole,
+                    preferred_country: data.preferredCountry || null,
+                  });
+                } catch (e) {
+                  console.error("Failed to save profile:", e);
+                }
+                navigate("/dashboard");
+              }}
+            >
+              Start Getting Jobs
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </motion.div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center">

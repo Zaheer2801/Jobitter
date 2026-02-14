@@ -38,11 +38,11 @@ const OnboardingRole = () => {
       setStep("role");
       return;
     }
-    navigate("/");
+    navigate("/onboarding/name");
   };
 
   return (
-    <OnboardingShell step={1} totalSteps={3}>
+    <OnboardingShell step={2} totalSteps={4}>
       <AnimatePresence mode="wait">
         {step === "role" ? (
           <motion.div
@@ -52,17 +52,8 @@ const OnboardingRole = () => {
             exit={{ opacity: 0, x: -40 }}
             className="flex flex-col items-center text-center"
           >
-            <motion.div
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.1 }}
-              className="text-5xl md:text-6xl mb-8"
-            >
-              👋
-            </motion.div>
-
             <SplitText
-              text="To start, share a current or previous role:"
+              text={`Nice to meet you, ${data.candidateName || "there"}! Share a current or previous role:`}
               className="text-heading text-2xl md:text-3xl lg:text-4xl leading-snug mb-10"
               delay={0.3}
               splitType="words"

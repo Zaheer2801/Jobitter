@@ -137,7 +137,7 @@ const OnboardingResume = () => {
   };
 
   return (
-    <OnboardingShell step={2} totalSteps={3}>
+    <OnboardingShell step={3} totalSteps={4}>
       <div className="flex flex-col items-center text-center">
         <AnimatePresence mode="wait">
           {!file ? (
