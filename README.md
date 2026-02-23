@@ -12,7 +12,7 @@
 ## ✨ Key Features
 
 ### 🎯 Personalized Onboarding
-- **Name & Color Theme** — Enter your name and pick a favorite color that dynamically themes the entire app (9 vibrant color options).
+- **Name Entry** — Enter your name to personalize the experience.
 - **Role Selection** — Choose your desired job role to tailor job recommendations.
 - **Resume Upload & Parsing** — Upload your resume (PDF) and our backend automatically extracts your skills, summary, and experience.
 - **Career Path Discovery** — AI-generated career path suggestions based on your profile and skills.
@@ -21,7 +21,6 @@
 - **Profile Overview** — View your parsed profile with skills, role title, and summary at a glance.
 - **Job Alerts** — Get matched with relevant job listings scraped from real job boards.
 - **WhatsApp Notifications (Premium)** — Premium users can set up WhatsApp webhook alerts for new job matches.
-- **Dynamic Theming** — Your chosen color theme persists across the entire app session.
 
 ### 🔐 Authentication
 - **Google OAuth** — One-click sign-in with Google for a seamless experience.
@@ -126,26 +125,24 @@ The following environment variables are required (auto-configured in Lovable Clo
 ### Landing Page
 > Animated hero with the Jobitter logo, "Start" CTA, and a "How it works" breakdown.
 
-![Landing Page](https://jobitter.lovable.app/)
-
-🔗 **[View Live →](https://jobitter.lovable.app/)**
+![Landing Page](public/screenshots/landing-page.png)
 
 ### Onboarding Flow
-> Step-by-step guided onboarding: Name + Color Theme → Role → Resume Upload → Career Paths.
+> Step-by-step guided onboarding: Name → Role → Resume Upload → Career Paths.
+
+![Onboarding](public/screenshots/onboarding.png)
 
 | Step | Description |
 |------|-------------|
-| 1. Name & Color | Enter your name and pick a favorite color to theme the app |
+| 1. Name | Enter your name |
 | 2. Role | Select your desired job role |
 | 3. Resume | Upload your PDF resume for AI parsing |
 | 4. Career Paths | View AI-generated career recommendations |
 
-🔗 **[Try Onboarding →](https://jobitter.lovable.app/onboarding/name)**
+### Dashboard
+> Your personalized dashboard with profile overview, job alerts, and premium features.
 
-### Dashboard & Auth
-> Sign in with Google to access your personalized dashboard with profile, job alerts, and premium features.
-
-🔗 **[View Dashboard →](https://jobitter.lovable.app/dashboard)**
+![Dashboard](public/screenshots/dashboard.png)
 
 ## 🤝 Contributing
 

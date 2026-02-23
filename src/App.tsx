@@ -3,10 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { OnboardingProvider, useOnboarding } from "@/contexts/OnboardingContext";
+import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { ThemeProvider } from "next-themes";
 import { AnimatePresence } from "framer-motion";
-import { useColorTheme } from "@/hooks/useColorTheme";
 import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
 import OnboardingName from "./pages/OnboardingName";
@@ -18,12 +17,6 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
-
-const ColorThemeApplier = () => {
-  const { data } = useOnboarding();
-  useColorTheme(data.favoriteColor);
-  return null;
-};
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -51,7 +44,6 @@ const App = () => (
         <Toaster />
         <Sonner />
         <OnboardingProvider>
-          <ColorThemeApplier />
           <BrowserRouter>
             <AnimatedRoutes />
           </BrowserRouter>
