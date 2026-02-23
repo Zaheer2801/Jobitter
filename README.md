@@ -1,73 +1,149 @@
-# Welcome to your Lovable project
+# Jobitter — AI-Powered Job Discovery Platform
 
-## Project info
+![Jobitter](https://img.shields.io/badge/Jobitter-Job%20Discovery-blue)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-06B6D4?logo=tailwindcss)
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 About Jobitter
 
-## How can I edit this code?
+**Jobitter** is a modern, AI-powered job discovery and career guidance platform designed to help job seekers find relevant opportunities effortlessly. It features a personalized onboarding experience, dynamic theming, resume parsing, career path recommendations, and real-time job alerts — all wrapped in a sleek, animated interface.
 
-There are several ways of editing your application.
+## ✨ Key Features
 
-**Use Lovable**
+### 🎯 Personalized Onboarding
+- **Name & Color Theme** — Enter your name and pick a favorite color that dynamically themes the entire app (9 vibrant color options).
+- **Role Selection** — Choose your desired job role to tailor job recommendations.
+- **Resume Upload & Parsing** — Upload your resume (PDF) and our backend automatically extracts your skills, summary, and experience.
+- **Career Path Discovery** — AI-generated career path suggestions based on your profile and skills.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 📊 Smart Dashboard
+- **Profile Overview** — View your parsed profile with skills, role title, and summary at a glance.
+- **Job Alerts** — Get matched with relevant job listings scraped from real job boards.
+- **WhatsApp Notifications (Premium)** — Premium users can set up WhatsApp webhook alerts for new job matches.
+- **Dynamic Theming** — Your chosen color theme persists across the entire app session.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🔐 Authentication
+- **Google OAuth** — One-click sign-in with Google for a seamless experience.
+- **Email/Password** — Traditional signup and login with email verification.
+- **Role-Based Access** — Premium features are gated behind a premium user role system.
 
-**Use your preferred IDE**
+### 🎨 Design & UX
+- **Animated Transitions** — Smooth page transitions and micro-interactions powered by Framer Motion.
+- **Aurora Background** — Beautiful animated gradient background on the landing page.
+- **Split Text Animations** — Eye-catching text reveal animations throughout the onboarding flow.
+- **Dark/Light Mode** — Full theme support with semantic design tokens.
+- **Mobile Responsive** — Works across desktop, tablet, and mobile devices.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠️ Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18, TypeScript, Vite |
+| **Styling** | Tailwind CSS, shadcn/ui components |
+| **Animations** | Framer Motion |
+| **State Management** | React Context, TanStack React Query |
+| **Backend** | Lovable Cloud (Supabase) |
+| **Authentication** | Google OAuth, Email/Password |
+| **Database** | PostgreSQL with Row Level Security |
+| **Edge Functions** | Deno (resume parsing, job scraping, alerts) |
+| **Routing** | React Router v6 |
 
-Follow these steps:
+## 📁 Project Structure
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/              # shadcn/ui base components
+│   ├── AnimatedText.tsx  # Text animation component
+│   ├── BubbleMenu.tsx    # Floating bubble navigation
+│   ├── JobitterLogo.tsx  # Brand logo component
+│   ├── OnboardingShell.tsx # Onboarding layout wrapper
+│   ├── PageTransition.tsx  # Route transition animations
+│   ├── Prism.tsx         # 3D prism visual effect
+│   └── ThemeToggle.tsx   # Dark/light mode toggle
+├── contexts/            # React context providers
+│   └── OnboardingContext.tsx  # Onboarding state management
+├── hooks/               # Custom React hooks
+│   ├── useAuth.ts        # Authentication logic
+│   ├── useColorTheme.ts  # Dynamic color theming
+│   └── use-mobile.tsx    # Mobile detection
+├── pages/               # Route pages
+│   ├── Index.tsx          # Landing page
+│   ├── Auth.tsx           # Login/Signup
+│   ├── Dashboard.tsx      # Main dashboard
+│   ├── OnboardingName.tsx # Name + color selection
+│   ├── OnboardingRole.tsx # Role selection
+│   ├── OnboardingResume.tsx # Resume upload
+│   └── OnboardingPaths.tsx  # Career path results
+├── integrations/        # External service integrations
+│   └── supabase/         # Database client & types
+└── lib/                 # Utility functions
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- npm or bun package manager
+
+### Local Development
+
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment Variables
 
-**Use GitHub Codespaces**
+The following environment variables are required (auto-configured in Lovable Cloud):
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Variable | Description |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | Backend API URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Public API key |
 
-## What technologies are used for this project?
+## 🔒 Security
 
-This project is built with:
+- **Row Level Security (RLS)** enabled on all database tables
+- **User data isolation** — users can only access their own profiles and settings
+- **Secure OAuth flow** with proper redirect handling
+- **Premium feature gating** via database role checks
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📱 Screenshots
 
-## How can I deploy this project?
+### Landing Page
+Animated aurora background with floating bubble navigation and split-text hero section.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Onboarding Flow
+Step-by-step guided onboarding: Name → Color Theme → Role → Resume Upload → Career Paths.
 
-## Can I connect a custom domain to my Lovable project?
+### Dashboard
+Profile overview, job alerts, and premium feature promotion.
 
-Yes, you can!
+## 🤝 Contributing
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 📄 License
+
+This project is private and proprietary.
+
+---
+
+Built with ❤️ using [Lovable](https://lovable.dev)
