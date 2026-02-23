@@ -124,13 +124,28 @@ The following environment variables are required (auto-configured in Lovable Clo
 ## 📱 Screenshots
 
 ### Landing Page
-Animated aurora background with floating bubble navigation and split-text hero section.
+> Animated hero with the Jobitter logo, "Start" CTA, and a "How it works" breakdown.
+
+![Landing Page](https://jobitter.lovable.app/)
+
+🔗 **[View Live →](https://jobitter.lovable.app/)**
 
 ### Onboarding Flow
-Step-by-step guided onboarding: Name → Color Theme → Role → Resume Upload → Career Paths.
+> Step-by-step guided onboarding: Name + Color Theme → Role → Resume Upload → Career Paths.
 
-### Dashboard
-Profile overview, job alerts, and premium feature promotion.
+| Step | Description |
+|------|-------------|
+| 1. Name & Color | Enter your name and pick a favorite color to theme the app |
+| 2. Role | Select your desired job role |
+| 3. Resume | Upload your PDF resume for AI parsing |
+| 4. Career Paths | View AI-generated career recommendations |
+
+🔗 **[Try Onboarding →](https://jobitter.lovable.app/onboarding/name)**
+
+### Dashboard & Auth
+> Sign in with Google to access your personalized dashboard with profile, job alerts, and premium features.
+
+🔗 **[View Dashboard →](https://jobitter.lovable.app/dashboard)**
 
 ## 🤝 Contributing
 
