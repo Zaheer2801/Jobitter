@@ -21,7 +21,6 @@ export interface OnboardingData {
   candidateName: string;
   currentRole: string;
   preferredCountry: string;
-  favoriteColor: string;
   resumeFile: File | null;
   resumeProfile: ResumeProfile | null;
   careerPaths: CareerPath[];
@@ -31,7 +30,6 @@ const defaultData: OnboardingData = {
   candidateName: "",
   currentRole: "",
   preferredCountry: "",
-  favoriteColor: "",
   resumeFile: null,
   resumeProfile: null,
   careerPaths: [],
